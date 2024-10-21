@@ -21,7 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-indigo-700 text-white">
         <div className="p-4">
-          <h1 className="text-2xl font-semibold">Health Indicators</h1>
+          <h1 className="text-2xl font-semibold">DATAIND</h1>
         </div>
         <nav className="mt-8">
           <Link to="/" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">

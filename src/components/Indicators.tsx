@@ -23,7 +23,7 @@ const Indicators: React.FC = () => {
   const fetchIndicators = async () => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get('http://your-backend-url/api/indicators/');
+      const response = await axios.get('http://localhost:8000/api/indicators/');
       dispatch(setIndicators(response.data));
     } catch (err) {
       dispatch(setError('Failed to fetch indicators'));
@@ -33,7 +33,7 @@ const Indicators: React.FC = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://your-backend-url/api/indicators/', newIndicator);
+      await axios.post('http://localhost:8000/api/indicators/', newIndicator);
       setNewIndicator({ name: '', value: 0 });
       fetchIndicators();
     } catch (err) {
@@ -43,7 +43,7 @@ const Indicators: React.FC = () => {
 
   const handleUpdate = async (id: number, updatedIndicator: Partial<Indicator>) => {
     try {
-      await axios.put(`http://your-backend-url/api/indicators/${id}/`, updatedIndicator);
+      await axios.put(`http://localhost:8000/api/indicators/${id}/`, updatedIndicator);
       fetchIndicators();
     } catch (err) {
       dispatch(setError('Failed to update indicator'));
@@ -52,7 +52,7 @@ const Indicators: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://your-backend-url/api/indicators/${id}/`);
+      await axios.delete(`http://localhost:8000/api/indicators/${id}/`);
       fetchIndicators();
     } catch (err) {
       dispatch(setError('Failed to delete indicator'));

@@ -16,7 +16,7 @@ const Companies: React.FC = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get('http://your-backend-url/api/companies/');
+        const response = await axios.get('http://localhost:8000/api/companies/');
         setCompanies(response.data);
         setLoading(false);
       } catch (err) {
@@ -34,7 +34,7 @@ const Companies: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Companies</h1>
+        <h1 className="text-3xl font-bold mb-6">Empresas</h1>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

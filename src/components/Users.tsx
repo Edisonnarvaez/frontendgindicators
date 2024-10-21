@@ -35,7 +35,7 @@ const Users: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Users</h1>
+        <h1 className="text-3xl font-bold mb-6">Usuarios</h1>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
