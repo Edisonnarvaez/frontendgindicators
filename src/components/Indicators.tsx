@@ -65,7 +65,7 @@ const Indicators: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Indicators</h1>
+        <h1 className="text-3xl font-bold mb-6">Indicadores</h1>
         <form onSubmit={handleCreate} className="mb-6">
           <input
             type="text"
@@ -81,7 +81,7 @@ const Indicators: React.FC = () => {
             placeholder="Value"
             className="mr-2 p-2 border rounded"
           />
-          <button type="submit" className="bg-blue-500 text-white p-2 rounded">Add Indicator</button>
+          <button type="submit" className="bg-blue-500 text-white p-2 rounded">Agregar Indicador</button>
         </form>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">

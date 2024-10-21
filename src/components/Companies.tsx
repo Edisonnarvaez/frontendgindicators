@@ -5,7 +5,13 @@ import Layout from './Layout';
 interface Company {
   id: number;
   name: string;
-  industry: string;
+  nit: string;
+  legalRepresentative: string;
+  phone: string;
+  address: string;
+  contactEmail: string;
+  foundationDate: "dataString";
+  status: boolean;
 }
 
 const Companies: React.FC = () => {
@@ -40,8 +46,14 @@ const Companies: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIT</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Representante legal</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefono</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direccion</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de fundacion</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -49,7 +61,13 @@ const Companies: React.FC = () => {
                 <tr key={company.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{company.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{company.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{company.industry}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.nit}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.legalRepresentative}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.phone}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.address}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.contactEmail}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.foundationDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.status}</td>
                 </tr>
               ))}
             </tbody>

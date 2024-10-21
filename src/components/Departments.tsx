@@ -5,7 +5,11 @@ import Layout from './Layout';
 interface Department {
   id: number;
   name: string;
+  departmentCode: string;
   company: string;
+  description: string;
+  creationDate: string;  // Cambiado a string
+  status: boolean;
 }
 
 const Departments: React.FC = () => {
@@ -28,7 +32,7 @@ const Departments: React.FC = () => {
     fetchDepartments();
   }, []);
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
   return (
@@ -41,7 +45,11 @@ const Departments: React.FC = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department Code</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creation Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -49,7 +57,11 @@ const Departments: React.FC = () => {
                 <tr key={department.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{department.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{department.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{department.company}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{department.departmentCode}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{department.company.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{department.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{new Date(department.creationDate).toLocaleDateString()}</td> {/* Formato de fecha legible */}
+                  <td className="px-6 py-4 whitespace-nowrap">{department.status ? 'Activo' : 'Inactivo'}</td> {/* Booleano como texto */}
                 </tr>
               ))}
             </tbody>
