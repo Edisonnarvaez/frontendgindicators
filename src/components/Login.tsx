@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://your-backend-url/api/token/', { username, password });
+      const response = await axios.post('http://localhost:8000/api/users/login/', { username, password });
       dispatch(setToken(response.data.access));
       navigate('/');
     } catch (err) {
