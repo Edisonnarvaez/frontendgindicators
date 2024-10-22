@@ -44,9 +44,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Activity className="mr-2" size={20} />
             Indicators
           </Link>
-          <Link to="/macroProcess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+          <Link to="/macroprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Activity className="mr-2" size={20} />
             Macro Process
+          </Link>
+          <Link to="/process" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <Activity className="mr-2" size={20} />
+            Process
+          </Link>
+          <Link to="/subprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <Activity className="mr-2" size={20} />
+            SubProcess
           </Link>
         </nav>
         <div className="absolute bottom-0 w-64 p-4">
@@ -55,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="w-full flex items-center justify-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded text-white"
           >
             <LogOut className="mr-2" size={20} />
-            Logout
+            Cerrar Sesion
           </button>
         </div>
       </aside>

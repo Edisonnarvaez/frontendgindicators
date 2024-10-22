@@ -6,12 +6,12 @@ interface Process {
   id: number;
   name: string;
   description: string;
-  department: string;
   code: string;
   version: string;
   status: boolean;
   creationDate: "datestring";
   updateDate: "datestring";
+  macroProcess: string;
   user: string;
 
 }
@@ -24,7 +24,7 @@ const Process: React.FC = () => {
   useEffect(() => {
     const fetchProcess = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/process/');
+        const response = await axios.get('http://localhost:8000/api/processes/');
         setProcess(response.data);
         setLoading(false);
       } catch (err) {
@@ -49,15 +49,15 @@ const Process: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">description</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">department</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">version</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">creationDate</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">updateDate</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">user</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de creacion</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de actualizacion</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Macro proceso</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -66,12 +66,12 @@ const Process: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{Proces.department}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.code}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.version}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.status}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.creationDate}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.updateDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.macroProcess.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{Proces.user.name}</td>
                 </tr>
               ))}

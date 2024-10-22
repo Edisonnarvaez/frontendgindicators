@@ -9,6 +9,8 @@ import Companies from './components/Companies';
 import Departments from './components/Departments';
 import Indicators from './components/Indicators';
 import MacroProcess from './components/MacroProcess';
+import Process from './components/Process';
+import SubProcess from './components/SubProcess';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -23,7 +25,9 @@ function App() {
             <Route path="/companies" element={<PrivateRoute><Companies /></PrivateRoute>} />
             <Route path="/departments" element={<PrivateRoute><Departments /></PrivateRoute>} />
             <Route path="/indicators" element={<PrivateRoute><Indicators /></PrivateRoute>} />
-            <Route path="/macroproces" element={<PrivateRoute><MacroProcess /></PrivateRoute>} />
+            <Route path="/macroprocess" element={<PrivateRoute><MacroProcess /></PrivateRoute>} />
+            <Route path="/process" element={<PrivateRoute><Process /></PrivateRoute>} />
+            <Route path="/subprocess" element={<PrivateRoute><SubProcess /></PrivateRoute>} />
           </Routes>
         </div>
       </Router>
