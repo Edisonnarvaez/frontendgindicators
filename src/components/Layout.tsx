@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { BarChart, Users, Building, Briefcase, Activity, LogOut } from 'lucide-react';
+import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, LogOut } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -45,15 +45,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Indicators
           </Link>
           <Link to="/macroprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
-            <Activity className="mr-2" size={20} />
+            <Dock className="mr-2" size={20} />
             Macro Process
           </Link>
           <Link to="/process" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
-            <Activity className="mr-2" size={20} />
+            <FolderKanban className="mr-2" size={20} />
             Process
           </Link>
           <Link to="/subprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
-            <Activity className="mr-2" size={20} />
+            <SquareChartGantt className="mr-2" size={20} />
             SubProcess
           </Link>
         </nav>
