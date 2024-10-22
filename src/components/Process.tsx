@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 
-interface MacroProcess {
+interface Process {
   id: number;
   name: string;
   description: string;
@@ -16,25 +16,25 @@ interface MacroProcess {
 
 }
 
-const MacroProcess: React.FC = () => {
-  const [MacroProcess, setMacroProcess] = useState<MacroProcess[]>([]);
+const Process: React.FC = () => {
+  const [Process, setProcess] = useState<Process[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMacroProcess = async () => {
+    const fetchProcess = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/macroprocess/');
-        setMacroProcess(response.data);
+        const response = await axios.get('http://localhost:8000/api/process/');
+        setProcess(response.data);
         setLoading(false);
       } catch (err) {
         console.error(err);
-        setError('Failed to fetch MacroProcess');
+        setError('Failed to fetch Process');
         setLoading(false);
       }
     };
 
-    fetchMacroProcess();
+    fetchProcess();
   }, []);
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
@@ -43,7 +43,7 @@ const MacroProcess: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Macro Procesos</h1>
+        <h1 className="text-3xl font-bold mb-6">Procesos</h1>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -61,18 +61,18 @@ const MacroProcess: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {MacroProcess.map((MacroProces) => (
-                <tr key={MacroProces.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.status}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.creationDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.updateDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.user.name}</td>
+              {Process.map((Proces) => (
+                <tr key={Proces.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.department}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.version}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.creationDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.updateDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{Proces.user.name}</td>
                 </tr>
               ))}
             </tbody>
@@ -83,4 +83,4 @@ const MacroProcess: React.FC = () => {
   );
 };
 
-export default MacroProcess;
+export default Process;

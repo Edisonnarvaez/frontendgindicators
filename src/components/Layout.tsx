@@ -44,6 +44,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Activity className="mr-2" size={20} />
             Indicators
           </Link>
+          <Link to="/macroProcess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <Activity className="mr-2" size={20} />
+            Macro Process
+          </Link>
         </nav>
         <div className="absolute bottom-0 w-64 p-4">
           <button

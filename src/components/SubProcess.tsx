@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 
-interface MacroProcess {
+interface SubProcess {
   id: number;
   name: string;
   description: string;
@@ -16,25 +16,25 @@ interface MacroProcess {
 
 }
 
-const MacroProcess: React.FC = () => {
-  const [MacroProcess, setMacroProcess] = useState<MacroProcess[]>([]);
+const SubProcess: React.FC = () => {
+  const [SubProcess, setSubProcess] = useState<SubProcess[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMacroProcess = async () => {
+    const fetchSubProcess = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/macroprocess/');
-        setMacroProcess(response.data);
+        const response = await axios.get('http://localhost:8000/api/subprocess/');
+        setSubProcess(response.data);
         setLoading(false);
       } catch (err) {
         console.error(err);
-        setError('Failed to fetch MacroProcess');
+        setError('Failed to fetch SubProcess');
         setLoading(false);
       }
     };
 
-    fetchMacroProcess();
+    fetchSubProcess();
   }, []);
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
@@ -43,7 +43,7 @@ const MacroProcess: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Macro Procesos</h1>
+        <h1 className="text-3xl font-bold mb-6">Sub Procesos</h1>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -61,18 +61,18 @@ const MacroProcess: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {MacroProcess.map((MacroProces) => (
-                <tr key={MacroProces.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.status}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.creationDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.updateDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{MacroProces.user.name}</td>
+              {SubProcess.map((SubProces) => (
+                <tr key={SubProces.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.department}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.version}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.creationDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.updateDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{SubProces.user.name}</td>
                 </tr>
               ))}
             </tbody>
@@ -83,4 +83,4 @@ const MacroProcess: React.FC = () => {
   );
 };
 
-export default MacroProcess;
+export default SubProcess;
