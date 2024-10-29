@@ -11,6 +11,8 @@ import Indicators from './components/Indicators';
 import MacroProcess from './components/MacroProcess';
 import Process from './components/Process';
 import SubProcess from './components/SubProcess';
+import MacroProcessComponent from './components/MacroProcessComponent';
+import MacroProcessForm from './components/MacroProcessForm';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -28,6 +30,10 @@ function App() {
             <Route path="/macroprocess" element={<PrivateRoute><MacroProcess /></PrivateRoute>} />
             <Route path="/process" element={<PrivateRoute><Process /></PrivateRoute>} />
             <Route path="/subprocess" element={<PrivateRoute><SubProcess /></PrivateRoute>} />
+            {/* Ruta principal que muestra la lista de MacroProcesos */}
+            {/*<Route path="/" element={<MacroProcessComponent />} />*/}
+            {/* Ruta para abrir el formulario de nuevo macroproceso */}
+            <Route path="/new-macro-process" element={<MacroProcessForm />} />
           </Routes>
         </div>
       </Router>
