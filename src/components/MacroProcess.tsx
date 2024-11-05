@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 
+interface Department {
+  id: number;
+  name: string;
+}
+
 interface MacroProcess {
   id: number;
   name: string;
   description: string;
-  department: string;
+  department: number;  // Cambiado a un solo número en lugar de array
   code: string;
   version: string;
   status: boolean;
@@ -17,43 +22,64 @@ interface MacroProcess {
 
 const MacroProcessComponent: React.FC = () => {
   const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Estado del formulario
   const [form, setForm] = useState<Partial<MacroProcess>>({
     name: '',
     description: '',
-    department: '',
+    department: 0,  // Solo un valor, no un array
     code: '',
     version: '',
     status: true,
-    creationDate: '',
-    updateDate: '',
-    user: ''
   });
 
   useEffect(() => {
-    const fetchMacroProcess = async () => {
+    const fetchMacroProcesses = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/macroprocesses/');
         setMacroProcesses(response.data);
         setLoading(false);
       } catch (err) {
         console.error(err);
-        setError('Failed to fetch MacroProcess');
+        setError('Failed to fetch MacroProcesses');
         setLoading(false);
       }
     };
 
-    fetchMacroProcess();
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/departments/');
+        setDepartments(response.data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch Departments');
+      }
+    };
+
+    fetchMacroProcesses();
+    fetchDepartments();
   }, []);
 
-  // Manejar cambios en el formulario
+  // Manejar cambios en los inputs de texto
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
+  };
+
+  // Manejar cambios en el select de estado (booleano)
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value === 'true', // Conversión a booleano
+    }));
   };
 
   // Manejar envío del formulario
@@ -67,13 +93,10 @@ const MacroProcessComponent: React.FC = () => {
         setForm({
           name: '',
           description: '',
-          department: '',
+          department: 0,  // Reiniciar el campo a 0
           code: '',
           version: '',
           status: true,
-          creationDate: '',
-          updateDate: '',
-          user: ''
         }); // Limpiar el formulario
         // Actualizar la lista de macroprocesos después de agregar uno nuevo
         setMacroProcesses((prevMacroProcesses) => [...prevMacroProcesses, response.data]);
@@ -142,15 +165,20 @@ const MacroProcessComponent: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="department" className="block text-sm font-medium">Área</label>
-                    <input
-                      type="text"
+                    <label htmlFor="department" className="block text-sm font-medium">Departamento</label>
+                    <select
                       name="department"
-                      value={form.department || ''}
-                      onChange={handleChange}
+                      value={form.department || 0}  // Asignar el valor único
+                      onChange={handleChange}  // Seleccionar un solo departamento
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
-                      required
-                    />
+                    >
+                      <option value={0} disabled>Seleccionar departamento</option>
+                      {departments.map(dept => (
+                        <option key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label htmlFor="code" className="block text-sm font-medium">Código</label>
@@ -179,7 +207,7 @@ const MacroProcessComponent: React.FC = () => {
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
-                      onChange={handleChange}
+                      onChange={handleSelectChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                     >
                       <option value="true">Activo</option>
@@ -225,17 +253,19 @@ const MacroProcessComponent: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {macroProcesses.map((macroProcess) => (
                 <tr key={macroProcess.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{macroProcess.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.department}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.version}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {macroProcess.status ? 'Activo' : 'Inactivo'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
-                      className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md"
                       onClick={() => handleDelete(macroProcess.id)}
+                      className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md"
                     >
                       Eliminar
                     </button>
