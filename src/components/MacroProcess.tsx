@@ -17,7 +17,7 @@ interface MacroProcess {
   status: boolean;
   creationDate: string;
   updateDate: string;
-  user: string;
+  user: number;  // Asumimos que el ID del usuario es un número
 }
 
 const MacroProcessComponent: React.FC = () => {
@@ -85,8 +85,19 @@ const MacroProcessComponent: React.FC = () => {
   // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Verificar y ajustar los datos que se enviarán
+    const formData = {
+      ...form,
+      status: form.status,  // Asegurarse de que el valor de 'status' sea booleano
+      department: form.department,  // El ID del departamento
+      user: 1,  // Cambia esto según cómo obtienes el ID del usuario (por ejemplo, desde el contexto de autenticación)
+    };
+
+    console.log('Datos a enviar:', formData);  // Verificar los datos antes de enviarlos
+
     try {
-      const response = await axios.post('http://localhost:8000/api/macroprocesses/', form);
+      const response = await axios.post('http://localhost:8000/api/macroprocesses/', formData);
       if (response.status === 201) {
         alert('Macroproceso creado exitosamente');
         setIsModalOpen(false); // Cerrar el modal al enviar el formulario
@@ -102,7 +113,8 @@ const MacroProcessComponent: React.FC = () => {
         setMacroProcesses((prevMacroProcesses) => [...prevMacroProcesses, response.data]);
       }
     } catch (error) {
-      console.error('Error al enviar los datos', error);
+      console.error('Error al enviar los datos', error.response?.data);
+      alert('Error al crear el macroproceso');
     }
   };
 
@@ -206,12 +218,12 @@ const MacroProcessComponent: React.FC = () => {
                     <label htmlFor="status" className="block text-sm font-medium">Estado</label>
                     <select
                       name="status"
-                      value={form.status ? 'true' : 'false'}
+                      value={form.status ? true : false}
                       onChange={handleSelectChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                     >
-                      <option value="true">Activo</option>
-                      <option value="false">Inactivo</option>
+                      <option value={true}>Activo</option>
+                      <option value={false}>Inactivo</option>
                     </select>
                   </div>
                   <div className="flex justify-end space-x-2">
@@ -224,7 +236,7 @@ const MacroProcessComponent: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md"
                     >
                       Guardar
                     </button>
@@ -243,29 +255,19 @@ const MacroProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Área</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Versión</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {macroProcesses.map((macroProcess) => (
                 <tr key={macroProcess.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{macroProcess.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {macroProcess.status ? 'Activo' : 'Inactivo'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{macroProcess.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.description}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     <button
+                      className="text-red-600 hover:text-red-800"
                       onClick={() => handleDelete(macroProcess.id)}
-                      className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-md"
                     >
                       Eliminar
                     </button>
