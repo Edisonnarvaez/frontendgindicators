@@ -11,13 +11,13 @@ interface MacroProcess {
   id: number;
   name: string;
   description: string;
-  department: number;  // Cambiado a un solo número en lugar de array
+  department: number;
   code: string;
   version: string;
   status: boolean;
   creationDate: string;
   updateDate: string;
-  user: number;  // Asumimos que el ID del usuario es un número
+  user: number;
 }
 
 const MacroProcessComponent: React.FC = () => {
@@ -26,12 +26,12 @@ const MacroProcessComponent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Estado para saber si estamos en edición
 
-  // Estado del formulario
   const [form, setForm] = useState<Partial<MacroProcess>>({
     name: '',
     description: '',
-    department: 0,  // Solo un valor, no un array
+    department: 0,
     code: '',
     version: '',
     status: true,
@@ -64,7 +64,6 @@ const MacroProcessComponent: React.FC = () => {
     fetchDepartments();
   }, []);
 
-  // Manejar cambios en los inputs de texto
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
@@ -73,61 +72,100 @@ const MacroProcessComponent: React.FC = () => {
     }));
   };
 
-  // Manejar cambios en el select de estado (booleano)
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: value === 'true', // Conversión a booleano
+      [name]: value === 'true', 
     }));
   };
 
-  // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Verificar y ajustar los datos que se enviarán
     const formData = {
       ...form,
-      status: form.status,  // Asegurarse de que el valor de 'status' sea booleano
-      department: form.department,  // El ID del departamento
-      user: 1,  // Cambia esto según cómo obtienes el ID del usuario (por ejemplo, desde el contexto de autenticación)
+      status: form.status, 
+      department: form.department, 
+      user: 1, 
     };
 
-    console.log('Datos a enviar:', formData);  // Verificar los datos antes de enviarlos
-
     try {
-      const response = await axios.post('http://localhost:8000/api/macroprocesses/', formData);
-      if (response.status === 201) {
+      if (isEditing) {
+        const response = await axios.put(
+          `http://localhost:8000/api/macroprocesses/${form.id}/`,
+          formData
+        );
+        alert('Macroproceso actualizado exitosamente');
+        setMacroProcesses((prev) =>
+          prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
+        );
+      } else {
+        const response = await axios.post('http://localhost:8000/api/macroprocesses/', formData);
         alert('Macroproceso creado exitosamente');
-        setIsModalOpen(false); // Cerrar el modal al enviar el formulario
-        setForm({
-          name: '',
-          description: '',
-          department: 0,  // Reiniciar el campo a 0
-          code: '',
-          version: '',
-          status: true,
-        }); // Limpiar el formulario
-        // Actualizar la lista de macroprocesos después de agregar uno nuevo
-        setMacroProcesses((prevMacroProcesses) => [...prevMacroProcesses, response.data]);
+        setMacroProcesses((prev) => [...prev, response.data]);
       }
+
+      setIsModalOpen(false);
+      setForm({
+        name: '',
+        description: '',
+        department: 0,
+        code: '',
+        version: '',
+        status: true,
+      });
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error al enviar los datos', error.response?.data);
-      alert('Error al crear el macroproceso');
+      console.error('Error al guardar los datos', error);
+      alert('Error al crear o actualizar el macroproceso');
     }
+  };
+
+  const handleEdit = (macroProcess: MacroProcess) => {
+    setForm(macroProcess);
+    setIsEditing(true);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`http://localhost:8000/api/macroprocesses/${id}/`);
-      // Actualizar la lista de macroprocesos después de eliminar uno
       setMacroProcesses((prevMacroProcesses) =>
         prevMacroProcesses.filter((macroProcess) => macroProcess.id !== id)
       );
     } catch (error) {
       console.error('Error al eliminar el macroproceso', error);
     }
+  };
+
+  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      const response = await axios.patch(`http://localhost:8000/api/macroprocesses/${id}/`, {
+        status: !currentStatus,
+      });
+      setMacroProcesses((prevMacroProcesses) =>
+        prevMacroProcesses.map((macroProcess) =>
+          macroProcess.id === id ? { ...macroProcess, status: response.data.status } : macroProcess
+        )
+      );
+    } catch (error) {
+      console.error('Error al cambiar el estado', error);
+    }
+  };
+
+  // Abrir modal para agregar macroproceso (limpio, sin datos)
+  const handleOpenModal = () => {
+    setIsEditing(false);  // Establecer isEditing en false para asegurar que estamos en modo de creación
+    setForm({
+      name: '',
+      description: '',
+      department: 0,
+      code: '',
+      version: '',
+      status: true,
+    });  // Limpiar el formulario
+    setIsModalOpen(true);
   };
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
@@ -138,10 +176,10 @@ const MacroProcessComponent: React.FC = () => {
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Macro Procesos</h1>
         
-        {/* Botón para abrir el modal */}
+        {/* Botón para abrir el modal para agregar un nuevo macroproceso */}
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenModal}  // Usamos la función `handleOpenModal`
         >
           Agregar MacroProceso
         </button>
@@ -151,7 +189,7 @@ const MacroProcessComponent: React.FC = () => {
           <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen">
               <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
-                <h2 className="text-2xl font-bold mb-4">Agregar nuevo MacroProceso</h2>
+                <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} MacroProceso</h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
@@ -180,8 +218,8 @@ const MacroProcessComponent: React.FC = () => {
                     <label htmlFor="department" className="block text-sm font-medium">Departamento</label>
                     <select
                       name="department"
-                      value={form.department || 0}  // Asignar el valor único
-                      onChange={handleChange}  // Seleccionar un solo departamento
+                      value={form.department || 0}  
+                      onChange={handleChange}  
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                     >
                       <option value={0} disabled>Seleccionar departamento</option>
@@ -218,12 +256,12 @@ const MacroProcessComponent: React.FC = () => {
                     <label htmlFor="status" className="block text-sm font-medium">Estado</label>
                     <select
                       name="status"
-                      value={form.status ? true : false}
+                      value={form.status ? 'true' : 'false'}
                       onChange={handleSelectChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                     >
-                      <option value={true}>Activo</option>
-                      <option value={false}>Inactivo</option>
+                      <option value="true">Activo</option>
+                      <option value="false">Inactivo</option>
                     </select>
                   </div>
                   <div className="flex justify-end space-x-2">
@@ -238,7 +276,7 @@ const MacroProcessComponent: React.FC = () => {
                       type="submit"
                       className="px-4 py-2 bg-blue-600 text-white rounded-md"
                     >
-                      Guardar
+                      {isEditing ? 'Actualizar' : 'Guardar'}
                     </button>
                   </div>
                 </form>
@@ -266,10 +304,22 @@ const MacroProcessComponent: React.FC = () => {
                   <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.description}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <button
-                      className="text-red-600 hover:text-red-800"
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEdit(macroProcess)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="ml-4 text-red-600 hover:text-red-800"
                       onClick={() => handleDelete(macroProcess.id)}
                     >
                       Eliminar
+                    </button>
+                    <button
+                      className={`ml-4 ${macroProcess.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
+                      onClick={() => handleToggleStatus(macroProcess.id, macroProcess.status)}
+                    >
+                      {macroProcess.status ? 'Inactivar' : 'Activar'}
                     </button>
                   </td>
                 </tr>
