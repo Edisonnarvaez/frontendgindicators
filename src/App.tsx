@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import Login from './components/Login';
+import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
 import Users from './components/Users';
 import Companies from './components/Companies';
@@ -22,6 +23,7 @@ function App() {
         <div className="min-h-screen bg-gray-100">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
             <Route path="/companies" element={<PrivateRoute><Companies /></PrivateRoute>} />
