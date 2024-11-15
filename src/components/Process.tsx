@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
 
+interface MacroProcess {
+  id: number;
+  name: string;
+}
+
 interface Process {
   id: number;
   name: string;
@@ -9,130 +14,144 @@ interface Process {
   code: string;
   version: string;
   status: boolean;
+  macroProcess: number;
   creationDate: string;
   updateDate: string;
-  macroProcess: { name: string };
-  user: { name: string };
+  user: number;
 }
 
-const Process: React.FC = () => {
+const ProcessComponent: React.FC = () => {
   const [processes, setProcesses] = useState<Process[]>([]);
+  const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newProcess, setNewProcess] = useState<Process>({
-    id: 0,
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [form, setForm] = useState<Partial<Process>>({
     name: '',
     description: '',
     code: '',
     version: '',
     status: true,
-    creationDate: '',
-    updateDate: '',
-    macroProcess: { name: '' },
-    user: { name: '' },
+    macroProcess: 0,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingProcess, setEditingProcess] = useState<Partial<Process>>({});
 
   useEffect(() => {
+    const fetchProcesses = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/processes/');
+        setProcesses(response.data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch Processes');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchMacroProcesses = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/macroprocesses/');
+        setMacroProcesses(response.data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch MacroProcesses');
+      }
+    };
+
     fetchProcesses();
+    fetchMacroProcesses();
   }, []);
 
-  const fetchProcesses = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('http://localhost:8000/api/processes/');
-      setProcesses(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch Processes');
-      setLoading(false);
-    }
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post('http://localhost:8000/api/processes/', newProcess);
-      setNewProcess({
-        id: 0,
-        name: '',
-        description: '',
-        code: '',
-        version: '',
-        status: true,
-        creationDate: '',
-        updateDate: '',
-        macroProcess: { name: '' },
-        user: { name: '' },
-      });
-      fetchProcesses();
-      setIsModalOpen(false);
-    } catch (err) {
-      setError('Failed to create process');
-    }
-  };
-
-  const handleUpdate = async (id: number, updatedProcess: Partial<Process>) => {
-    try {
-      await axios.put(`http://localhost:8000/api/processes/${id}/`, updatedProcess);
-      fetchProcesses();
-      setIsModalOpen(false);
-    } catch (err) {
-      setError('Failed to update process');
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`http://localhost:8000/api/processes/${id}/`);
-      fetchProcesses();
-    } catch (err) {
-      setError('Failed to delete process');
-    }
-  };
-
-  const handleOpenModal = (process?: Process) => {
-    if (process) {
-      setEditingProcess(process);
-      setIsEditing(true);
-    } else {
-      setEditingProcess({
-        name: '',
-        description: '',
-        code: '',
-        version: '',
-        status: true,
-        macroProcess: { name: '' },
-        user: { name: '' },
-      });
-      setIsEditing(false);
-    }
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setIsEditing(false);
-    setEditingProcess({});
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setEditingProcess((prev) => ({
-      ...prev,
-      [name]: value,
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: name === 'status' ? value === 'true' : value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEditing && editingProcess.id) {
-      handleUpdate(editingProcess.id, editingProcess);
-    } else {
-      handleCreate(e);
+
+    const formData = {
+      ...form,
+      user: 1,
+    };
+
+    try {
+      if (isEditing) {
+        const response = await axios.put(`http://localhost:8000/api/processes/${form.id}/`, formData);
+        setProcesses((prev) =>
+          prev.map((process) => (process.id === response.data.id ? response.data : process))
+        );
+        alert('Proceso actualizado exitosamente');
+      } else {
+        const response = await axios.post('http://localhost:8000/api/processes/', formData);
+        setProcesses((prev) => [...prev, response.data]);
+        alert('Proceso creado exitosamente');
+      }
+
+      setIsModalOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error al guardar el proceso', error);
+      alert('Error al guardar el proceso');
     }
+  };
+
+  const handleEdit = (process: Process) => {
+    setForm(process);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Está seguro de eliminar este proceso?')) return;
+
+    try {
+      await axios.delete(`http://localhost:8000/api/processes/${id}/`);
+      setProcesses((prev) => prev.filter((process) => process.id !== id));
+      alert('Proceso eliminado exitosamente');
+    } catch (error) {
+      console.error('Error al eliminar el proceso', error);
+      alert('Error al eliminar el proceso');
+    }
+  };
+
+  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      const response = await axios.patch(`http://localhost:8000/api/processes/${id}/`, {
+        status: !currentStatus,
+      });
+      setProcesses((prev) =>
+        prev.map((process) =>
+          process.id === id ? { ...process, status: response.data.status } : process
+        )
+      );
+    } catch (error) {
+      console.error('Error al cambiar el estado', error);
+      alert('Error al cambiar el estado del proceso');
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      name: '',
+      description: '',
+      code: '',
+      version: '',
+      status: true,
+      macroProcess: 0,
+    });
+    setIsEditing(false);
+    setIsModalOpen(false);
+  };
+
+  const openModal = () => {
+    resetForm();
+    setIsModalOpen(true);
   };
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
@@ -142,94 +161,93 @@ const Process: React.FC = () => {
     <Layout>
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Procesos</h1>
-
-        {/* Button to open modal for adding process */}
         <button
-          onClick={() => handleOpenModal()}
-          className="bg-blue-500 text-white p-2 rounded mb-4"
+          className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+          onClick={openModal}
         >
           Agregar Proceso
         </button>
 
-        {/* Modal for creating or editing process */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Proceso</h2>
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={editingProcess.name || ''}
-                      onChange={handleChange}
-                      className="mt-1 p-2 block w-full border rounded-md"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Descripción</label>
-                    <textarea
-                      name="description"
-                      value={editingProcess.description || ''}
-                      onChange={handleChange}
-                      className="mt-1 p-2 block w-full border rounded-md"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Código</label>
-                    <input
-                      type="text"
-                      name="code"
-                      value={editingProcess.code || ''}
-                      onChange={handleChange}
-                      className="mt-1 p-2 block w-full border rounded-md"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Versión</label>
-                    <input
-                      type="text"
-                      name="version"
-                      value={editingProcess.version || ''}
-                      onChange={handleChange}
-                      className="mt-1 p-2 block w-full border rounded-md"
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Estado</label>
-                    <input
-                      type="checkbox"
-                      name="status"
-                      checked={editingProcess.status || false}
-                      onChange={(e) => handleChange({
-                        target: { name: 'status', value: e.target.checked }
-                      })}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleCloseModal}
-                      className="mr-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                    >
-                      {isEditing ? 'Actualizar' : 'Crear'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Proceso</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nombre"
+                  value={form.name || ''}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  name="description"
+                  placeholder="Descripción"
+                  value={form.description || ''}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  name="code"
+                  placeholder="Código"
+                  value={form.code || ''}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+                <input
+                  type="text"
+                  name="version"
+                  placeholder="Versión"
+                  value={form.version || ''}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+                <select
+                  name="macroProcess"
+                  value={form.macroProcess || 0}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                  required
+                >
+                  <option value={0} disabled>Seleccionar MacroProceso</option>
+                  {macroProcesses.map((macro) => (
+                    <option key={macro.id} value={macro.id}>
+                      {macro.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="status"
+                  value={form.status ? 'true' : 'false'}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-300 rounded-md"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                  >
+                    {isEditing ? 'Actualizar' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -238,44 +256,30 @@ const Process: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Versión</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de creación</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de actualización</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Macro Proceso</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {processes.map((process) => (
                 <tr key={process.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.version}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.creationDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.updateDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.macroProcess.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{process.user.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleOpenModal(process)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-2"
-                    >
+                  <td className="px-6 py-4">{process.id}</td>
+                  <td className="px-6 py-4">{process.name}</td>
+                  <td className="px-6 py-4">{process.description}</td>
+                  <td className="px-6 py-4">
+                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(process)}>
                       Editar
                     </button>
-                    <button
-                      onClick={() => handleDelete(process.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
+                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(process.id)}>
                       Eliminar
+                    </button>
+                    <button
+                      className={`ml-4 ${process.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
+                      onClick={() => handleToggleStatus(process.id, process.status)}
+                    >
+                      {process.status ? 'Inactivar' : 'Activar'}
                     </button>
                   </td>
                 </tr>
@@ -288,4 +292,4 @@ const Process: React.FC = () => {
   );
 };
 
-export default Process;
+export default ProcessComponent;
