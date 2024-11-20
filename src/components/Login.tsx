@@ -29,14 +29,31 @@ const Login: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/users/login/', { username, password });
-      dispatch(setToken(response.data.access));
+      const response = await axios.post('http://localhost:8000/api/users/login/', {
+        username,
+        password,
+      });
 
-      if (rememberMe) {
-        localStorage.setItem('token', response.data.access);
+      // Verifica la respuesta de la API
+      console.log(response.data); // Agregado para verificar la respuesta
+
+      // Asegúrate de que el token esté presente en la respuesta
+      const token = response.data.token; // O el campo correcto de acuerdo con la respuesta de la API
+
+      if (token) {
+        // Almacena el token en Redux
+        dispatch(setToken(token));
+
+        // Si el checkbox "Recordar sesión" está marcado, almacena el token en localStorage
+        if (rememberMe) {
+          localStorage.setItem('token', token);
+        }
+
+        // Redirige a la página principal
+        navigate('/');
+      } else {
+        setError('No se recibió el token de la API');
       }
-
-      navigate('/');
     } catch (err) {
       setError('Credenciales incorrectas o servidor no disponible');
     } finally {
