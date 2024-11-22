@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.2.1",
     "axios": "^1.6.7",
     "health-indicators-frontend": "file:",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.453.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
