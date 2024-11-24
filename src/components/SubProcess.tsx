@@ -129,13 +129,33 @@ const SubProcessComponent: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Está seguro de eliminar este subproceso?')) return;
+
     try {
       await axios.delete(`http://localhost:8000/api/subprocesses/${id}/`);
-      setSubProcesses((prev) => prev.filter((sp) => sp.id !== id));
+      setSubProcesses((prev) => prev.filter((subprocess) => subprocess.id !== id));
+      alert('Subproceso eliminado exitosamente');
     } catch (error) {
-      console.error('Error al eliminar el SubProceso', error);
+      console.error('Error al eliminar el subproceso', error);
+      alert('Error al eliminar el subproceso');
     }
   };
+
+  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    try {
+      const response = await axios.patch(`http://localhost:8000/api/subprocesses/${id}/`, {
+        status: !currentStatus,
+      });
+      setSubProcesses((prevSubProcesses) =>
+        prevSubProcesses.map((subProcess) =>
+          subProcess.id === id ? { ...subProcess, status: response.data.status } : subProcess
+        )
+      );
+    } catch (error) {
+      console.error('Error al cambiar el estado', error);
+    }
+  };
+
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
@@ -218,8 +238,8 @@ const SubProcessComponent: React.FC = () => {
                     <label htmlFor="code" className="block text-sm font-medium">Autor</label>
                     <input
                       type="text"
-                      name="code"
-                      value={form.code || ''}
+                      name="author"
+                      value={form.author || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                       required
@@ -284,25 +304,25 @@ const SubProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
-            </thead>
+            </thead>            
             <tbody className="bg-white divide-y divide-gray-200">
               {subProcesses.map((subProcess) => (
                 <tr key={subProcess.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{subProcess.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{subProcess.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{subProcess.description}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <button
-                      onClick={() => handleEdit(subProcess)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
+                  <td className="px-6 py-4">{subProcess.id}</td>
+                  <td className="px-6 py-4">{subProcess.name}</td>
+                  <td className="px-6 py-4">{subProcess.description}</td>
+                  <td className="px-6 py-4">
+                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(subProcess)}>
                       Editar
                     </button>
-                    <button
-                      onClick={() => handleDelete(subProcess.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
+                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(subProcess.id)}>
                       Eliminar
+                    </button>
+                    <button
+                      className={`ml-4 ${subProcess.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
+                      onClick={() => handleToggleStatus(subProcess.id, subProcess.status)}
+                    >
+                      {subProcess.status ? 'Inactivar' : 'Activar'}
                     </button>
                   </td>
                 </tr>

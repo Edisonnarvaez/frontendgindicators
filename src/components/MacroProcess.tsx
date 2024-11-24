@@ -129,13 +129,15 @@ const MacroProcessComponent: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Está seguro de eliminar este macroproceso?')) return;
+
     try {
       await axios.delete(`http://localhost:8000/api/macroprocesses/${id}/`);
-      setMacroProcesses((prevMacroProcesses) =>
-        prevMacroProcesses.filter((macroProcess) => macroProcess.id !== id)
-      );
+      setMacroProcesses((prev) => prev.filter((macroProcess) => macroProcess.id !== id));
+      alert('Macroproceso eliminado exitosamente');
     } catch (error) {
       console.error('Error al eliminar el macroproceso', error);
+      alert('Error al eliminar el macroproceso');
     }
   };
 
