@@ -20,9 +20,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-indigo-700 text-white">
-        <div className="p-4">
-          <h1 className="text-2xl font-semibold">DATAIND</h1>
+      <div className="p-4">
+        <div className="flex items-center">
+          <img src="/assets/logo1.svg" alt="Logo DataInd" className="h-12 w-18 mr-1" />
+          <h1 className="text-2xl font-semibold">DataInd</h1>
         </div>
+      </div>
         <nav className="mt-8">
           <Link to="/users" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Users className="mr-2" size={20} />
