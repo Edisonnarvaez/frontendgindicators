@@ -15,6 +15,7 @@ import SubProcess from './components/SubProcess';
 import MacroProcessComponent from './components/MacroProcessComponent';
 import MacroProcessForm from './components/MacroProcessForm';
 import PrivateRoute from './components/PrivateRoute';
+import Results from './components/Results';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/macroprocess" element={<PrivateRoute><MacroProcess /></PrivateRoute>} />
             <Route path="/process" element={<PrivateRoute><Process /></PrivateRoute>} />
             <Route path="/subprocess" element={<PrivateRoute><SubProcess /></PrivateRoute>} />
+            <Route path="/Results" element={<PrivateRoute><Results isOpen={true} onClose={() => {}} onSave={() => {}} currentUserId={"1"} /></PrivateRoute>} />
             {/* Ruta principal que muestra la lista de MacroProcesos */}
             {/*<Route path="/" element={<MacroProcessComponent />} />*/}
             {/* Ruta para abrir el formulario de nuevo macroproceso */}

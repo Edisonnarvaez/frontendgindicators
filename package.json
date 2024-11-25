@@ -11,12 +11,13 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
-    "axios": "^1.6.7",
+    "axios": "^1.7.7",
     "health-indicators-frontend": "file:",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.453.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.2",
     "react-redux": "^9.1.0",
     "react-router-dom": "^6.22.3",
     "recharts": "^2.12.2"

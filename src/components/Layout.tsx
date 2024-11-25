@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, LogOut } from 'lucide-react';
+import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,10 +24,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <h1 className="text-2xl font-semibold">DATAIND</h1>
         </div>
         <nav className="mt-8">
-          <Link to="/" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
-            <BarChart className="mr-2" size={20} />
-            Dashboard
-          </Link>
           <Link to="/users" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Users className="mr-2" size={20} />
             Users
@@ -40,21 +36,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Briefcase className="mr-2" size={20} />
             Departments
           </Link>
-          <Link to="/indicators" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
-            <Activity className="mr-2" size={20} />
-            Indicators
-          </Link>
+          
           <Link to="/macroprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Dock className="mr-2" size={20} />
-            Macro Process
+            MacroProcesos
           </Link>
           <Link to="/process" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <FolderKanban className="mr-2" size={20} />
-            Process
+            Procesos
           </Link>
           <Link to="/subprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <SquareChartGantt className="mr-2" size={20} />
-            SubProcess
+            SubProcesos
+          </Link>
+          <Link to="/indicators" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <Activity className="mr-2" size={20} />
+            Indicadores
+          </Link>
+          <Link to="/results" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <ChartLine className="mr-2" size={20} />
+            Resultados
+          </Link>
+          <Link to="/" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <BarChart className="mr-2" size={20} />
+            Dashboard
           </Link>
         </nav>
         <div className="absolute bottom-0 w-64 p-4">
