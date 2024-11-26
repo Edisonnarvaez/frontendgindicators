@@ -96,6 +96,8 @@ const ResultComponent: React.FC = () => {
       user: 1, // Usuario fijo, ajustar según sea necesario.
     };
 
+    console.log(formData)
+
     try {
       if (isEditing) {
         const response = await axios.put(
@@ -136,6 +138,7 @@ const ResultComponent: React.FC = () => {
     setIsEditing(true);
     setIsModalOpen(true);
   };
+
 
   const handleDelete = async (id: number) => {
     if (window.confirm("¿Está seguro de eliminar este resultado?")) {
@@ -203,6 +206,27 @@ const ResultComponent: React.FC = () => {
           </div>
         </div>
 
+        <button
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          onClick={() => {
+            setIsModalOpen(true);
+            setIsEditing(false);
+            setFormData({
+              headquarters: "",
+              indicator: "",
+              numerator: 0,
+              denominator: 0,
+              year: new Date().getFullYear(),
+              month: new Date().getMonth() + 1,
+              quarter: 0,
+              semester: 0,
+              //calculationMethod: "",
+            });
+          }}
+        >
+          Agregar Resultado
+        </button>
+
         <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
@@ -241,26 +265,7 @@ const ResultComponent: React.FC = () => {
           </table>
         </div>
 
-        <button
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          onClick={() => {
-            setIsModalOpen(true);
-            setIsEditing(false);
-            setFormData({
-              headquarters: "",
-              indicator: "",
-              numerator: 0,
-              denominator: 0,
-              year: new Date().getFullYear(),
-              month: new Date().getMonth() + 1,
-              quarter: 0,
-              semester: 0,
-              //calculationMethod: "",
-            });
-          }}
-        >
-          Agregar Resultado
-        </button>
+        
       </div>
 
       {isModalOpen && (
@@ -320,6 +325,7 @@ const ResultComponent: React.FC = () => {
                   className="mt-1 block w-full px-4 py-2 border rounded-lg"
                 />
               </div>
+              
               
               <div className="flex justify-between">
                 <button
