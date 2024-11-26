@@ -325,8 +325,46 @@ const ResultComponent: React.FC = () => {
                   className="mt-1 block w-full px-4 py-2 border rounded-lg"
                 />
               </div>
-              
-              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-600">Año</label>
+                <input
+                  type="number"
+                  name="year"
+                  value={form.year}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-600">Mes</label>
+                <input
+                  type="number"
+                  name="month"
+                  value={form.month}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-600">Trimestre</label>
+                <input
+                  type="number"
+                  name="quarter"
+                  value={form.quarter}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-600">Semestre</label>
+                <input
+                  type="number"
+                  name="semester"
+                  value={form.semester}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
               <div className="flex justify-between">
                 <button
                   type="button"
