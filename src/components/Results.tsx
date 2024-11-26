@@ -14,10 +14,11 @@ interface Headquarters {
 
 interface Result {
   id: number;
-  headquarters: string;
-  indicator: string;
+  headquarters: number;
+  indicator: number;
   numerator: number;
   denominator: number;
+  calculatedValue: number;
   year: number;
   month: number;
   quarter: number;
@@ -36,8 +37,8 @@ const ResultComponent: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [form, setFormData] = useState<Partial<Result>>({
-    headquarters: "",
-    indicator: "",
+    headquarters: 0,
+    indicator: 0,
     numerator: 0,
     denominator: 0,
     year: new Date().getFullYear(),
@@ -74,16 +75,23 @@ const ResultComponent: React.FC = () => {
     fetchData();
   }, []);
 
+  //const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  //  const { name, value } = e.target;
+  //  setFormData({ ...form, [name]: value });
+  //};
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...form, [name]: value });
+    setFormData({
+      ...form,
+      [name]: name === "headquarters" || name === "indicator" ? Number(value) : value,
+    });
   };
 
   const handleFilter = () => {
     const filtered = results.filter(
       (result) =>
-        (headquartersFilter ? result.headquarters === headquartersFilter : true) &&
-        (indicatorFilter ? result.indicator === indicatorFilter : true)
+        (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
+        (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
     );
     setFilteredResults(filtered);
   };
@@ -97,7 +105,7 @@ const ResultComponent: React.FC = () => {
     };
 
     console.log(formData)
-
+/*
     try {
       if (isEditing) {
         const response = await axios.put(
@@ -112,12 +120,28 @@ const ResultComponent: React.FC = () => {
         const response = await axios.post("http://localhost:8000/api/results/", formData);
         setResults((prev) => [...prev, response.data]);
         alert("Resultado creado exitosamente.");
-      }
+      }*/
+      try {
+        if (isEditing) {
+          const response = await axios.put(
+            `http://localhost:8000/api/results/${form.id}/`,
+            formData
+          );
+          setResults((prev) =>
+            prev.map((r) => (r.id === response.data.id ? response.data : r))
+          );
+          alert("Resultado actualizado exitosamente.");
+        } else {
+          const response = await axios.post("http://localhost:8000/api/results/", formData);
+          setResults((prev) => [...prev, response.data]);
+          alert("Resultado creado exitosamente.");
+        }
+    
 
       setIsModalOpen(false);
       setFormData({
-        headquarters: "",
-        indicator: "",
+        headquarters: 0,
+        indicator: 0,
         numerator: 0,
         denominator: 0,
         year: new Date().getFullYear(),
@@ -172,7 +196,7 @@ const ResultComponent: React.FC = () => {
               >
                 <option value="">Seleccione...</option>
                 {headquarters.map((hq) => (
-                  <option key={hq.id} value={hq.name}>
+                  <option key={hq.id} value={hq.id}>
                     {hq.name}
                   </option>
                 ))}
@@ -188,7 +212,7 @@ const ResultComponent: React.FC = () => {
               >
                 <option value="">Seleccione...</option>
                 {indicators.map((indicator) => (
-                  <option key={indicator.id} value={indicator.name}>
+                  <option key={indicator.id} value={indicator.id}>
                     {indicator.name}
                   </option>
                 ))}
@@ -212,8 +236,8 @@ const ResultComponent: React.FC = () => {
             setIsModalOpen(true);
             setIsEditing(false);
             setFormData({
-              headquarters: "",
-              indicator: "",
+              headquarters: 0,
+              indicator: 0,
               numerator: 0,
               denominator: 0,
               year: new Date().getFullYear(),
@@ -283,7 +307,7 @@ const ResultComponent: React.FC = () => {
                 >
                   <option value="">Seleccione...</option>
                   {headquarters.map((hq) => (
-                    <option key={hq.id} value={hq.name}>
+                    <option key={hq.id} value={hq.id}>
                       {hq.name}
                     </option>
                   ))}
@@ -299,7 +323,7 @@ const ResultComponent: React.FC = () => {
                 >
                   <option value="">Seleccione...</option>
                   {indicators.map((indicator) => (
-                    <option key={indicator.id} value={indicator.name}>
+                    <option key={indicator.id} value={indicator.id}>
                       {indicator.name}
                     </option>
                   ))}
