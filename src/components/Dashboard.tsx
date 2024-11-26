@@ -5,6 +5,9 @@ import {
   XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer
 } from 'recharts';
 import Layout from './Layout';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE'];
 
@@ -74,6 +77,37 @@ const Dashboard: React.FC = () => {
     );
   });
 
+  // Función para exportar a Excel
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(filteredResults);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
+    XLSX.writeFile(wb, 'Resultados_Indicadores.xlsx');
+  };
+
+  // Función para exportar a PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Resultados por Indicador', 14, 16);
+    
+    const tableData = filteredResults.map((result) => [
+      result.macroProcess,
+      result.process,
+      result.subProcess,
+      result.creationDate,
+      result.calculatedValue
+    ]);
+
+    autoTable(doc, {
+      head: [['Macroproceso', 'Proceso', 'Subproceso', 'Fecha', 'Valor Calculado']],
+      body: tableData,
+      startY: 20,
+      theme: 'striped',
+    });
+
+    doc.save('Resultados_Indicadores.pdf');
+  };
+
   return (
     <Layout>
       <div className="p-6">
@@ -120,6 +154,22 @@ const Dashboard: React.FC = () => {
             onChange={e => setSelectedDate(e.target.value)}
             className="border rounded p-2"
           />
+        </div>
+
+        {/* Botones de exportación */}
+        <div className="mb-8">
+          <button
+            onClick={exportToExcel}
+            className="bg-blue-500 text-white p-2 rounded mr-4"
+          >
+            Exportar a Excel
+          </button>
+          <button
+            onClick={exportToPDF}
+            className="bg-green-500 text-white p-2 rounded"
+          >
+            Exportar a PDF
+          </button>
         </div>
 
         {/* Gráficos */}
