@@ -1,155 +1,176 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { setIndicators, setLoading, setError } from '../store/slices/indicatorSlice';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer
+} from 'recharts';
 import Layout from './Layout';
-import { IoBagHandle, IoPieChart, IoPeople, IoCart } from 'react-icons/io5';
 
-// Componente de estadísticas
-function DashboardStatsGrid() {
-  return (
-    <div className="flex gap-4 mb-8">
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-sky-500">
-          <IoBagHandle className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-gray-500 font-light">Total Results</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-gray-700 font-semibold">45</strong>
-          </div>
-        </div>
-      </BoxWrapper>
-      <BoxWrapper>
-        <div className="rounded-full h-12 w-12 flex items-center justify-center bg-green-600">
-          <IoPieChart className="text-2xl text-white" />
-        </div>
-        <div className="pl-4">
-          <span className="text-sm text-gray-500 font-light">Filtered Indicators</span>
-          <div className="flex items-center">
-            <strong className="text-xl text-gray-700 font-semibold">12</strong>
-          </div>
-        </div>
-      </BoxWrapper>
-    </div>
-  );
-}
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE'];
 
-function BoxWrapper({ children }: { children: React.ReactNode }) {
-  return <div className="bg-white rounded-sm p-4 flex-1 border border-gray-200 flex items-center">{children}</div>;
-}
-
-// Filtros para el Dashboard
-const Filters = ({ onFilter }: { onFilter: (filters: any) => void }) => {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [macroProcess, setMacroProcess] = useState('');
-  const [process, setProcess] = useState('');
-  const [subProcess, setSubProcess] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onFilter({ startDate, endDate, macroProcess, process, subProcess });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="Start Date"
-      />
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="End Date"
-      />
-      <input
-        type="text"
-        value={macroProcess}
-        onChange={(e) => setMacroProcess(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="Macroprocess"
-      />
-      <input
-        type="text"
-        value={process}
-        onChange={(e) => setProcess(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="Process"
-      />
-      <input
-        type="text"
-        value={subProcess}
-        onChange={(e) => setSubProcess(e.target.value)}
-        className="border p-2 rounded"
-        placeholder="Subprocess"
-      />
-      <button
-        type="submit"
-        className="bg-blue-500 text-white rounded p-2 hover:bg-blue-700 transition"
-      >
-        Apply Filters
-      </button>
-    </form>
-  );
-};
-
-// Componente principal Dashboard
 const Dashboard: React.FC = () => {
-  const dispatch = useDispatch();
-  const { indicators, loading, error } = useSelector((state: RootState) => state.indicators);
+  interface MacroProcess {
+    id: number;
+    name: string;
+  }
 
-  const fetchIndicators = async (filters: any) => {
-    dispatch(setLoading(true));
-    try {
-      const response = await axios.get('http://localhost:8000/api/indicators/', { params: filters });
-      dispatch(setIndicators(response.data));
-    } catch (err) {
-      dispatch(setError('Failed to fetch indicators'));
-    }
-  };
+  const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
+  interface Process {
+    id: number;
+    name: string;
+  }
 
-  const handleFilter = (filters: any) => {
-    fetchIndicators(filters);
-  };
+  const [processes, setProcesses] = useState<Process[]>([]);
+  interface SubProcess {
+    id: number;
+    name: string;
+  }
+
+  const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
+  const [indicators, setIndicators] = useState([]);
+  interface Result {
+    macroProcess: number;
+    process: number;
+    subProcess: number;
+    creationDate: string;
+    calculatedValue: number;
+  }
+
+  const [results, setResults] = useState<Result[]>([]);
+  
+  const [selectedMacroProcess, setSelectedMacroProcess] = useState('');
+  const [selectedProcess, setSelectedProcess] = useState('');
+  const [selectedSubProcess, setSelectedSubProcess] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
-    fetchIndicators({});
+    const fetchData = async () => {
+      try {
+        const macroRes = await axios.get('http://localhost:8000/api/macroprocesses/');
+        const processRes = await axios.get('http://localhost:8000/api/processes/');
+        const subProcessRes = await axios.get('http://localhost:8000/api/subprocesses/');
+        const indicatorRes = await axios.get('http://localhost:8000/api/indicators/');
+        const resultRes = await axios.get('http://localhost:8000/api/results/');
+        
+        setMacroProcesses(macroRes.data);
+        setProcesses(processRes.data);
+        setSubProcesses(subProcessRes.data);
+        setIndicators(indicatorRes.data);
+        setResults(resultRes.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    
+    fetchData();
   }, []);
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
-  if (error) return <Layout><div>Error: {error}</div></Layout>;
+  const filteredResults = results.filter(result => {
+    return (
+      (!selectedMacroProcess || result.macroProcess === parseInt(selectedMacroProcess)) &&
+      (!selectedProcess || result.process === parseInt(selectedProcess)) &&
+      (!selectedSubProcess || result.subProcess === parseInt(selectedSubProcess)) &&
+      (!selectedDate || result.creationDate.startsWith(selectedDate))
+    );
+  });
 
   return (
     <Layout>
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-
+        
         {/* Filtros */}
-        <Filters onFilter={handleFilter} />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <select 
+            value={selectedMacroProcess}
+            onChange={e => setSelectedMacroProcess(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Macroprocesos</option>
+            {macroProcesses.map(mp => (
+              <option key={mp.id} value={mp.id}>{mp.name}</option>
+            ))}
+          </select>
 
-        {/* Sección de estadísticas */}
-        <DashboardStatsGrid />
+          <select 
+            value={selectedProcess}
+            onChange={e => setSelectedProcess(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Procesos</option>
+            {processes.map(proc => (
+              <option key={proc.id} value={proc.id}>{proc.name}</option>
+            ))}
+          </select>
 
-        {/* Sección de gráficos */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Indicadores</h2>
+          <select 
+            value={selectedSubProcess}
+            onChange={e => setSelectedSubProcess(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Subprocesos</option>
+            {subProcesses.map(sp => (
+              <option key={sp.id} value={sp.id}>{sp.name}</option>
+            ))}
+          </select>
+
+          <input 
+            type="month" 
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            className="border rounded p-2"
+          />
+        </div>
+
+        {/* Gráficos */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-semibold mb-4">Resultados por Indicador</h2>
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={indicators}>
+            <BarChart data={filteredResults}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="creationDate" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="value" fill="#8884d8" />
+              <Bar dataKey="calculatedValue" fill="#8884d8" />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-semibold mb-4">Tendencia de Resultados</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={filteredResults}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="creationDate" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="calculatedValue" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Distribución de Indicadores</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={filteredResults}
+                dataKey="calculatedValue"
+                nameKey="creationDate"
+                cx="50%"
+                cy="50%"
+                outerRadius={150}
+                fill="#8884d8"
+                label
+              >
+                {filteredResults.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
