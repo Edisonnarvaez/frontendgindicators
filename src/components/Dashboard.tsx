@@ -8,6 +8,7 @@ import Layout from './Layout';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE'];
 
@@ -30,13 +31,19 @@ const Dashboard: React.FC = () => {
   }
 
   const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
-  const [indicators, setIndicators] = useState([]);
+  interface Indicator {
+    id: number;
+    name: string;
+  }
+
+  const [indicators, setIndicators] = useState<Indicator[]>([]);
   interface Result {
     macroProcess: number;
     process: number;
     subProcess: number;
     creationDate: string;
     calculatedValue: number;
+    indicator: number; // Agregado el campo indicador
   }
 
   const [results, setResults] = useState<Result[]>([]);
@@ -45,6 +52,7 @@ const Dashboard: React.FC = () => {
   const [selectedProcess, setSelectedProcess] = useState('');
   const [selectedSubProcess, setSelectedSubProcess] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedIndicator, setSelectedIndicator] = useState(''); // Filtro para indicador
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +81,8 @@ const Dashboard: React.FC = () => {
       (!selectedMacroProcess || result.macroProcess === parseInt(selectedMacroProcess)) &&
       (!selectedProcess || result.process === parseInt(selectedProcess)) &&
       (!selectedSubProcess || result.subProcess === parseInt(selectedSubProcess)) &&
-      (!selectedDate || result.creationDate.startsWith(selectedDate))
+      (!selectedDate || result.creationDate.startsWith(selectedDate)) &&
+      (!selectedIndicator || result.indicator === parseInt(selectedIndicator)) // Filtrar por indicador
     );
   });
 
@@ -97,7 +106,6 @@ const Dashboard: React.FC = () => {
       result.creationDate,
       result.calculatedValue
     ]);
-
     autoTable(doc, {
       head: [['Macroproceso', 'Proceso', 'Subproceso', 'Fecha', 'Valor Calculado']],
       body: tableData,
@@ -114,7 +122,7 @@ const Dashboard: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
         
         {/* Filtros */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <select 
             value={selectedMacroProcess}
             onChange={e => setSelectedMacroProcess(e.target.value)}
@@ -154,6 +162,17 @@ const Dashboard: React.FC = () => {
             onChange={e => setSelectedDate(e.target.value)}
             className="border rounded p-2"
           />
+
+          <select 
+            value={selectedIndicator}
+            onChange={e => setSelectedIndicator(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Indicadores</option>
+            {indicators.map(indicator => (
+              <option key={indicator.id} value={indicator.id}>{indicator.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Botones de exportación */}
