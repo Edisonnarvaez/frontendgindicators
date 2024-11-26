@@ -19,40 +19,65 @@ const Dashboard: React.FC = () => {
   }
 
   const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
+
   interface Process {
     id: number;
     name: string;
+    macroProcess: number;
   }
 
   const [processes, setProcesses] = useState<Process[]>([]);
+
   interface SubProcess {
     id: number;
     name: string;
+    process: number;
   }
 
   const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
+
   interface Indicator {
     id: number;
     name: string;
+    subProcess: number;
+    headquarters: number;
   }
 
   const [indicators, setIndicators] = useState<Indicator[]>([]);
+
   interface Result {
     macroProcess: number;
     process: number;
     subProcess: number;
+    indicator: number;
+    headquarters: number;
     creationDate: string;
     calculatedValue: number;
-    indicator: number; // Agregado el campo indicador
   }
 
   const [results, setResults] = useState<Result[]>([]);
-  
+
+  interface Department {
+    id: number;
+    name: string;
+  }
+
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  interface Headquarters {
+    id: number;
+    name: string;
+  }
+
+  const [headquarters, setHeadquarters] = useState<Headquarters[]>([]);
+
   const [selectedMacroProcess, setSelectedMacroProcess] = useState('');
   const [selectedProcess, setSelectedProcess] = useState('');
   const [selectedSubProcess, setSelectedSubProcess] = useState('');
+  const [selectedIndicator, setSelectedIndicator] = useState('');
+  const [selectedHeadquarters, setSelectedHeadquarters] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedIndicator, setSelectedIndicator] = useState(''); // Filtro para indicador
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,12 +87,16 @@ const Dashboard: React.FC = () => {
         const subProcessRes = await axios.get('http://localhost:8000/api/subprocesses/');
         const indicatorRes = await axios.get('http://localhost:8000/api/indicators/');
         const resultRes = await axios.get('http://localhost:8000/api/results/');
+        const departmentRes = await axios.get('http://localhost:8000/api/departments/');
+        const headquartersRes = await axios.get('http://localhost:8000/api/headquarters/');
         
         setMacroProcesses(macroRes.data);
         setProcesses(processRes.data);
         setSubProcesses(subProcessRes.data);
         setIndicators(indicatorRes.data);
         setResults(resultRes.data);
+        setDepartments(departmentRes.data);
+        setHeadquarters(headquartersRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -76,17 +105,21 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
+  const filteredProcesses = processes.filter(proc => proc.macroProcess === parseInt(selectedMacroProcess) || selectedMacroProcess === '');
+  const filteredSubProcesses = subProcesses.filter(sp => sp.process === parseInt(selectedProcess) || selectedProcess === '');
+  const filteredIndicators = indicators.filter(ind => ind.subProcess === parseInt(selectedSubProcess) || selectedSubProcess === '');
   const filteredResults = results.filter(result => {
     return (
       (!selectedMacroProcess || result.macroProcess === parseInt(selectedMacroProcess)) &&
       (!selectedProcess || result.process === parseInt(selectedProcess)) &&
       (!selectedSubProcess || result.subProcess === parseInt(selectedSubProcess)) &&
-      (!selectedDate || result.creationDate.startsWith(selectedDate)) &&
-      (!selectedIndicator || result.indicator === parseInt(selectedIndicator)) // Filtrar por indicador
+      (!selectedIndicator || result.indicator === parseInt(selectedIndicator)) &&
+      (!selectedHeadquarters || result.headquarters === parseInt(selectedHeadquarters)) &&
+      (!selectedDate || result.creationDate.startsWith(selectedDate))
     );
   });
 
-  // Función para exportar a Excel
+    // Función para exportar a Excel
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(filteredResults);
     const wb = XLSX.utils.book_new();
@@ -122,7 +155,7 @@ const Dashboard: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
         
         {/* Filtros */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <select 
             value={selectedMacroProcess}
             onChange={e => setSelectedMacroProcess(e.target.value)}
@@ -140,7 +173,7 @@ const Dashboard: React.FC = () => {
             className="border rounded p-2"
           >
             <option value="">Procesos</option>
-            {processes.map(proc => (
+            {filteredProcesses.map(proc => (
               <option key={proc.id} value={proc.id}>{proc.name}</option>
             ))}
           </select>
@@ -151,8 +184,41 @@ const Dashboard: React.FC = () => {
             className="border rounded p-2"
           >
             <option value="">Subprocesos</option>
-            {subProcesses.map(sp => (
+            {filteredSubProcesses.map(sp => (
               <option key={sp.id} value={sp.id}>{sp.name}</option>
+            ))}
+          </select>
+
+          <select 
+            value={selectedIndicator}
+            onChange={e => setSelectedIndicator(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Indicadores</option>
+            {filteredIndicators.map(ind => (
+              <option key={ind.id} value={ind.id}>{ind.name}</option>
+            ))}
+          </select>
+
+          <select 
+            value={selectedHeadquarters}
+            onChange={e => setSelectedHeadquarters(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Sedes</option>
+            {headquarters.map(hq => (
+              <option key={hq.id} value={hq.id}>{hq.name}</option>
+            ))}
+          </select>
+
+          <select 
+            value={selectedDepartment}
+            onChange={e => setSelectedDepartment(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="">Departamentos</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.id}>{dept.name}</option>
             ))}
           </select>
 
@@ -162,17 +228,6 @@ const Dashboard: React.FC = () => {
             onChange={e => setSelectedDate(e.target.value)}
             className="border rounded p-2"
           />
-
-          <select 
-            value={selectedIndicator}
-            onChange={e => setSelectedIndicator(e.target.value)}
-            className="border rounded p-2"
-          >
-            <option value="">Indicadores</option>
-            {indicators.map(indicator => (
-              <option key={indicator.id} value={indicator.id}>{indicator.name}</option>
-            ))}
-          </select>
         </div>
 
         {/* Botones de exportación */}
@@ -192,7 +247,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Gráficos */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Resultados por Indicador</h2>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={filteredResults}>
@@ -205,7 +260,6 @@ const Dashboard: React.FC = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <h2 className="text-xl font-semibold mb-4">Tendencia de Resultados</h2>
           <ResponsiveContainer width="100%" height={400}>
