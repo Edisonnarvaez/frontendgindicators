@@ -41,6 +41,7 @@ const ResultComponent: React.FC = () => {
     indicator: 0,
     numerator: 0,
     denominator: 0,
+    calculatedValue: 0,
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     quarter: 0,
@@ -144,6 +145,7 @@ const ResultComponent: React.FC = () => {
         indicator: 0,
         numerator: 0,
         denominator: 0,
+        calculatedValue: 0,
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
         quarter: 0,
@@ -250,7 +252,6 @@ const ResultComponent: React.FC = () => {
         >
           Agregar Resultado
         </button>
-
         <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
@@ -258,35 +259,44 @@ const ResultComponent: React.FC = () => {
                 <th className="px-4 py-2">Sede</th>
                 <th className="px-4 py-2">Indicador</th>
                 <th className="px-4 py-2">Año</th>
-                <th className="px-4 py-2">Mes</th>
+                <th className="px-4 py-2">Numerador</th>
+                <th className="px-4 py-2">Denominador</th>
+                <th className="px-4 py-2">Resultado</th>
                 <th className="px-4 py-2">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredResults.map((result) => (
-                <tr key={result.id}>
-                  <td className="px-4 py-2">{result.headquarters}</td>
-                  <td className="px-4 py-2">{result.indicator}</td>
-                  <td className="px-4 py-2">{result.year}</td>
-                  <td className="px-4 py-2">{result.month}</td>
-                  <td className="px-4 py-2">
-                    <button
-                      className="px-2 py-1 text-white bg-green-500 rounded-md mr-2"
-                      onClick={() => handleEdit(result)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="px-2 py-1 text-white bg-red-500 rounded-md"
-                      onClick={() => handleDelete(result.id)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredResults.map((result) => {
+                const hqName = headquarters.find((hq) => hq.id === result.headquarters)?.name || "N/A";
+                const indicatorName = indicators.find((ind) => ind.id === result.indicator)?.name || "N/A";
+
+                return (
+                  <tr key={result.id}>
+                    <td className="px-4 py-2">{hqName}</td>
+                    <td className="px-4 py-2">{indicatorName}</td>
+                    <td className="px-4 py-2">{result.year}</td>
+                    <td className="px-4 py-2">{result.numerator}</td>
+                    <td className="px-4 py-2">{result.denominator}</td>
+                    <td className="px-4 py-2">{result.calculatedValue}</td>
+                    <td className="px-4 py-2">
+                      <button
+                        className="px-2 py-1 text-white bg-green-500 rounded-md mr-2"
+                        onClick={() => handleEdit(result)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="px-2 py-1 text-white bg-red-500 rounded-md"
+                        onClick={() => handleDelete(result.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-          </table>
+        </table>
         </div>
 
         
