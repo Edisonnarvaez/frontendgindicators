@@ -224,7 +224,7 @@ const MacroProcessComponent: React.FC = () => {
                       onChange={handleChange}  
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
                     >
-                      <option value={0} disabled>Seleccionar departamento</option>
+                      <option value={0} disabled>Seleccionar area</option>
                       {departments.map(dept => (
                         <option key={dept.id} value={dept.id}>
                           {dept.name}
