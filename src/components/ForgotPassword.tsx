@@ -57,6 +57,11 @@ const ForgotPassword: React.FC = () => {
               {isLoading ? 'Enviando...' : 'Enviar enlace'}
             </button>
           </div>
+          <div className="text-center mt-8">
+            <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Ingresar
+            </a>
+          </div>
         </form>
       </div>
     </div>
