@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "./Layout";
 
-interface Indicator {
-  id: number;
-  name: string;
-}
-
 interface Headquarters {
   id: number;
   name: string;
 }
 
-interface Result {
+interface Indicator {
   id: number;
+  name: string;
+}
+
+interface Result {
+  id?: number;
   headquarters: number;
   indicator: number;
   numerator: number;
@@ -23,7 +23,6 @@ interface Result {
   month: number;
   quarter: number;
   semester: number;
-  //calculationMethod: string;
 }
 
 const ResultComponent: React.FC = () => {
@@ -31,11 +30,6 @@ const ResultComponent: React.FC = () => {
   const [headquarters, setHeadquarters] = useState<Headquarters[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [filteredResults, setFilteredResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
   const [form, setFormData] = useState<Partial<Result>>({
     headquarters: 0,
     indicator: 0,
@@ -46,11 +40,13 @@ const ResultComponent: React.FC = () => {
     month: new Date().getMonth() + 1,
     quarter: 0,
     semester: 0,
-    //calculationMethod: "",
   });
-
+  const [isEditing, setIsEditing] = useState(false);
+  const [isFormVisible, setFormVisible] = useState(false);
   const [headquartersFilter, setHeadquartersFilter] = useState<string>("");
   const [indicatorFilter, setIndicatorFilter] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,10 +72,6 @@ const ResultComponent: React.FC = () => {
     fetchData();
   }, []);
 
-  //const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  //  const { name, value } = e.target;
-  //  setFormData({ ...form, [name]: value });
-  //};
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -88,58 +80,21 @@ const ResultComponent: React.FC = () => {
     });
   };
 
-  const handleFilter = () => {
-    const filtered = results.filter(
-      (result) =>
-        (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
-        (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
-    );
-    setFilteredResults(filtered);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formData = {
-      ...form,
-      user: 1, // Usuario fijo, ajustar según sea necesario.
-    };
-
-    console.log(formData)
-/*
     try {
-      if (isEditing) {
-        const response = await axios.put(
-          `http://localhost:8000/api/results/${form.id}/`,
-          formData
-        );
+      const formData = { ...form, user: 1 }; // Ajusta el usuario según sea necesario.
+      if (isEditing && form.id) {
+        const response = await axios.put(`http://localhost:8000/api/results/${form.id}/`, formData);
         setResults((prev) =>
-          prev.map((r) => (r.id === response.data.id ? response.data : r))
+          prev.map((result) => (result.id === response.data.id ? response.data : result))
         );
         alert("Resultado actualizado exitosamente.");
       } else {
         const response = await axios.post("http://localhost:8000/api/results/", formData);
         setResults((prev) => [...prev, response.data]);
         alert("Resultado creado exitosamente.");
-      }*/
-      try {
-        if (isEditing) {
-          const response = await axios.put(
-            `http://localhost:8000/api/results/${form.id}/`,
-            formData
-          );
-          setResults((prev) =>
-            prev.map((r) => (r.id === response.data.id ? response.data : r))
-          );
-          alert("Resultado actualizado exitosamente.");
-        } else {
-          const response = await axios.post("http://localhost:8000/api/results/", formData);
-          setResults((prev) => [...prev, response.data]);
-          alert("Resultado creado exitosamente.");
-        }
-    
-
-      setIsModalOpen(false);
+      }
       setFormData({
         headquarters: 0,
         indicator: 0,
@@ -150,22 +105,31 @@ const ResultComponent: React.FC = () => {
         month: new Date().getMonth() + 1,
         quarter: 0,
         semester: 0,
-        //calculationMethod: "",
       });
       setIsEditing(false);
     } catch (err) {
-      console.error(err);
+      console.error("Error al guardar el resultado:", err);
       alert("Error al guardar el resultado.");
     }
   };
 
-  const handleEdit = (result: Result) => {
-    setFormData(result);
-    setIsEditing(true);
-    setIsModalOpen(true);
+const handleEdit = (result: Result) => {
+  setFormData(result);
+  setIsEditing(true);
+  setFormVisible(true);
+};
+
+  const toggleFormVisibility = () => {
+    setFormVisible((prev) => !prev);
   };
-
-
+  const handleFilter = () => {
+    const filtered = results.filter(
+      (result) =>
+        (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
+        (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
+    );
+    setFilteredResults(filtered);
+  };
   const handleDelete = async (id: number) => {
     if (window.confirm("¿Está seguro de eliminar este resultado?")) {
       try {
@@ -179,13 +143,151 @@ const ResultComponent: React.FC = () => {
     }
   };
 
-  if (loading) return <Layout>Loading...</Layout>;
-  if (error) return <Layout>{error}</Layout>;
-
   return (
     <Layout>
       <div className="p-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-semibold text-center text-gray-700 mb-6">Resultados de Indicadores</h1>
+        <h1 className="text-3xl font-semibold text-center mb-6">Resultados de Indicadores</h1>
+        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+          <button
+            onClick={toggleFormVisibility}
+            className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            {isFormVisible ? "Ocultar Formulario" : "Agregar Nuevo Resultado"}
+          </button>
+
+          {isFormVisible && (
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h2 className="text-xl font-semibold mb-4 text-center">
+                {isEditing ? "Editar Resultado" : "Agregar Nuevo Resultado"}
+              </h2>
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Sede</label>
+                  <select
+                    name="headquarters"
+                    value={form.headquarters}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Seleccione...</option>
+                    {headquarters.map((hq) => (
+                      <option key={hq.id} value={hq.id}>
+                        {hq.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Indicador</label>
+                  <select
+                    name="indicator"
+                    value={form.indicator}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Seleccione...</option>
+                    {indicators.map((indicator) => (
+                      <option key={indicator.id} value={indicator.id}>
+                        {indicator.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Numerador</label>
+                  <input
+                    type="number"
+                    name="numerator"
+                    value={form.numerator}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Denominador</label>
+                  <input
+                    type="number"
+                    name="denominator"
+                    value={form.denominator}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Año</label>
+                  <input
+                    type="number"
+                    name="year"
+                    value={form.year}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Mes</label>
+                  <input
+                    type="number"
+                    name="month"
+                    value={form.month}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Trimestre</label>
+                  <input
+                    type="number"
+                    name="quarter"
+                    value={form.quarter}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Semestre</label>
+                  <input
+                    type="number"
+                    name="semester"
+                    value={form.semester}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <div className="sm:col-span-2 flex justify-center space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({
+                        headquarters: 0,
+                        indicator: 0,
+                        numerator: 0,
+                        denominator: 0,
+                        calculatedValue: 0,
+                        year: new Date().getFullYear(),
+                        month: new Date().getMonth() + 1,
+                        quarter: 0,
+                        semester: 0,
+                      });
+                      setIsEditing(false);
+                    }}
+                    className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    {isEditing ? "Actualizar" : "Guardar"}
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          )}
+        </div>
+
 
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex space-x-4 mb-4">
@@ -232,26 +334,7 @@ const ResultComponent: React.FC = () => {
           </div>
         </div>
 
-        <button
-          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          onClick={() => {
-            setIsModalOpen(true);
-            setIsEditing(false);
-            setFormData({
-              headquarters: 0,
-              indicator: 0,
-              numerator: 0,
-              denominator: 0,
-              year: new Date().getFullYear(),
-              month: new Date().getMonth() + 1,
-              quarter: 0,
-              semester: 0,
-              //calculationMethod: "",
-            });
-          }}
-        >
-          Agregar Resultado
-        </button>
+        
         <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
@@ -287,7 +370,7 @@ const ResultComponent: React.FC = () => {
                       </button>
                       <button
                         className="px-2 py-1 text-white bg-red-500 rounded-md"
-                        onClick={() => handleDelete(result.id)}
+                        onClick={() => result.id && handleDelete(result.id)}
                       >
                         Eliminar
                       </button>
@@ -301,123 +384,6 @@ const ResultComponent: React.FC = () => {
 
         
       </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-2xl font-semibold mb-4">{isEditing ? "Editar Resultado" : "Agregar Resultado"}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Sede</label>
-                <select
-                  name="headquarters"
-                  value={form.headquarters}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                >
-                  <option value="">Seleccione...</option>
-                  {headquarters.map((hq) => (
-                    <option key={hq.id} value={hq.id}>
-                      {hq.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Indicador</label>
-                <select
-                  name="indicator"
-                  value={form.indicator}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                >
-                  <option value="">Seleccione...</option>
-                  {indicators.map((indicator) => (
-                    <option key={indicator.id} value={indicator.id}>
-                      {indicator.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Numerador</label>
-                <input
-                  type="number"
-                  name="numerator"
-                  value={form.numerator}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Denominador</label>
-                <input
-                  type="number"
-                  name="denominator"
-                  value={form.denominator}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Año</label>
-                <input
-                  type="number"
-                  name="year"
-                  value={form.year}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Mes</label>
-                <input
-                  type="number"
-                  name="month"
-                  value={form.month}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Trimestre</label>
-                <input
-                  type="number"
-                  name="quarter"
-                  value={form.quarter}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-600">Semestre</label>
-                <input
-                  type="number"
-                  name="semester"
-                  value={form.semester}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-md"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                >
-                  {isEditing ? "Actualizar" : "Guardar"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </Layout>
   );
 };
