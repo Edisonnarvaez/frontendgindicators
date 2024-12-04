@@ -259,6 +259,7 @@ const ProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
@@ -268,6 +269,7 @@ const ProcessComponent: React.FC = () => {
                   <td className="px-6 py-4">{process.id}</td>
                   <td className="px-6 py-4">{process.name}</td>
                   <td className="px-6 py-4">{process.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{process.status ? 'Activo' : 'Inactivo'}</td> 
                   <td className="px-6 py-4">
                     <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(process)}>
                       Editar
