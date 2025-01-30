@@ -29,15 +29,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <nav className="mt-8">
           <Link to="/users" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Users className="mr-2" size={20} />
-            Users
+            Usuarios
           </Link>
           <Link to="/companies" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Building className="mr-2" size={20} />
-            Companies
+            Empresas
           </Link>
           <Link to="/departments" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Briefcase className="mr-2" size={20} />
-            Departments
+            Areas
           </Link>
           
           <Link to="/macroprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
