@@ -240,6 +240,7 @@ const IndicatorComponent: React.FC = () => {
               <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
                 <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Indicador</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium">Nombre</label>
                     <input
@@ -466,6 +467,7 @@ const IndicatorComponent: React.FC = () => {
                       <option value="true">Activo</option>
                       <option value="false">Inactivo</option>
                     </select>
+                  </div>
                   </div>                  
                   <div className="flex justify-end space-x-2">
                     <button
@@ -482,6 +484,7 @@ const IndicatorComponent: React.FC = () => {
                       {isEditing ? 'Actualizar' : 'Guardar'}
                     </button>
                   </div>
+                  
                 </form>
               </div>
             </div>
