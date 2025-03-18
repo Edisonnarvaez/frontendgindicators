@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut } from 'lucide-react';
+import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut, Building2} from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,6 +35,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Building className="mr-2" size={20} />
             Empresas
           </Link>
+          <Link to="/headquarters" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <Building2 className="mr-2" size={20} />
+            Sedes
+          </Link>
+
           <Link to="/departments" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Briefcase className="mr-2" size={20} />
             Areas
