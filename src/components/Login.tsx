@@ -61,7 +61,7 @@ const Login: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:8000/api/users/verify_2fa/', {
         user_id: userId,
-        otp,
+        otp_code: otp,
       });
 
       handleLoginSuccess(response.data);
