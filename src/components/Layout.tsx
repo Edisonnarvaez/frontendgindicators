@@ -2,7 +2,8 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut, Building2} from 'lucide-react';
+import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut, Building2 } from 'lucide-react';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,12 +21,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-indigo-700 text-white">
-      <div className="p-4">
-        <div className="flex items-center">
-          <img src="/assets/logo1.svg" alt="Logo DataInd" className="h-12 w-18 mr-1" />
-          <h1 className="text-2xl font-semibold">DataInd</h1>
+        <div className="p-4">
+          <div className="flex items-center">
+            <img src="/assets/logo1.svg" alt="Logo DataInd" className="h-12 w-18 mr-1" />
+            <h1 className="text-2xl font-semibold">DataInd</h1>
+          </div>
         </div>
-      </div>
         <nav className="mt-8">
           <Link to="/users" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Users className="mr-2" size={20} />
@@ -44,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Briefcase className="mr-2" size={20} />
             Areas
           </Link>
-          
+
           <Link to="/macroprocess" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Dock className="mr-2" size={20} />
             MacroProcesos
@@ -71,6 +72,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Link>
         </nav>
         <div className="absolute bottom-0 w-64 p-4">
+          <Link to="/settings" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
+            <SettingsIcon className="mr-2" size={20} />
+            Configuraciones
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center py-2 px-4 bg-red-600 hover:bg-red-700 rounded text-white"

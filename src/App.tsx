@@ -17,6 +17,7 @@ import MacroProcessForm from './components/MacroProcessForm';
 import PrivateRoute from './components/PrivateRoute';
 import Results from './components/Results';
 import ResetPassword from './components/ResetPassword';   // El nuevo componente que crearemos
+import Settings from './components/Settings';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/process" element={<PrivateRoute><Process /></PrivateRoute>} />
             <Route path="/subprocess" element={<PrivateRoute><SubProcess /></PrivateRoute>} />
             <Route path="/Results" element={<PrivateRoute><Results isOpen={true} onClose={() => { }} onSave={() => { }} currentUserId={"1"} /></PrivateRoute>} />
+            <Route path="/settings" element={<Settings />} />
             {/* Ruta principal que muestra la lista de MacroProcesos */}
             {/*<Route path="/" element={<MacroProcessComponent />} />*/}
             {/* Ruta para abrir el formulario de nuevo macroproceso */}
