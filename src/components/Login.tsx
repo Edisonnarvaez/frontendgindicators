@@ -8,8 +8,8 @@ import { Lock } from 'lucide-react';
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [otp, setOtp] = useState<string>(''); // Código 2FA
-  const [userId, setUserId] = useState<number | null>(null); // ID para verificar 2FA
+  const [otp, setOtp] = useState<string>('');
+  const [userId, setUserId] = useState<number | null>(null);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,14 +37,16 @@ const Login: React.FC = () => {
         password,
       });
 
-      if (response.data.user_id) {
-        setUserId(response.data.user_id); // Si requiere 2FA
+      if (response.data.message === 'Ingrese su código 2FA' && response.data.user_id) {
+        setUserId(response.data.user_id);
         setError('Ingrese su código 2FA');
       } else {
         handleLoginSuccess(response.data);
       }
-    } catch (err) {
-      setError('Credenciales incorrectas o servidor no disponible');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || 'Credenciales incorrectas o servidor no disponible';
+      setError(errorMessage);
+      console.error('Error en login:', err.response?.data);
     } finally {
       setIsLoading(false);
     }
@@ -65,15 +67,15 @@ const Login: React.FC = () => {
       });
 
       handleLoginSuccess(response.data);
-    } catch (err) {
-      setError('Código 2FA inválido');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Código 2FA inválido');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLoginSuccess = (data: any) => {
-    const token = data.token || data.access;
+    const token = data.access;
     if (token) {
       dispatch(setToken(token));
       if (rememberMe) localStorage.setItem('token', token);
