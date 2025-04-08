@@ -126,7 +126,7 @@ const Settings: React.FC = () => {
   const handleToggle2FA = async () => {
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/2fa/toggle/',
+        'http://localhost:8000/api/users/2fa/toggle/',
         { enable_2fa: !profile.is_2fa_enabled },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -228,6 +228,11 @@ const Settings: React.FC = () => {
             >
               Guardar Cambios
             </button>
+            <div className="text-center mt-8">
+            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Volver
+            </a>
+          </div>
           </form>
         )}
 
@@ -272,6 +277,11 @@ const Settings: React.FC = () => {
             >
               Cambiar Contraseña
             </button>
+            <div className="text-center mt-8">
+            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Volver
+            </a>
+          </div>
           </form>
         )}
 
@@ -303,6 +313,11 @@ const Settings: React.FC = () => {
                 </p>
               </div>
             )}
+            <div className="text-center mt-8">
+            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Volver
+            </a>
+          </div>
           </div>
         )}
       </div>
@@ -310,4 +325,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings;
+export default Settings
