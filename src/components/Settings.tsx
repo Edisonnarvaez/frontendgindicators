@@ -57,6 +57,8 @@ const Settings: React.FC = () => {
   const [otpUri, setOtpUri] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const [loading2FA, setLoading2FA] = useState(false);
+
 
   useEffect(() => {
     fetchProfile();
@@ -124,18 +126,19 @@ const Settings: React.FC = () => {
   };
 
   const handleToggle2FA = async () => {
+    setLoading2FA(true);
     try {
       const response = await axios.post(
         'http://localhost:8000/api/users/2fa/toggle/',
         { enable_2fa: !profile.is_2fa_enabled },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       if (response.data.message === '2FA desactivado') {
         setProfile({ ...profile, is_2fa_enabled: false });
         setOtpSecret('');
         setOtpUri('');
         setSuccess('2FA desactivado correctamente');
-        // Recargar el perfil para confirmar el estado
         await fetchProfile();
       } else if (response.data.message === '2FA activado') {
         setProfile({ ...profile, is_2fa_enabled: true });
@@ -143,11 +146,15 @@ const Settings: React.FC = () => {
         setOtpUri(response.data.otp_uri || '');
         setSuccess('2FA activado correctamente');
       }
+
       setError('');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al configurar 2FA');
+    } finally {
+      setLoading2FA(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -161,11 +168,10 @@ const Settings: React.FC = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab as 'profile' | 'password' | '2fa')}
-              className={`py-2 px-4 text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? 'border-b-2 border-indigo-600 text-indigo-600'
-                  : 'text-gray-600 hover:text-indigo-600'
-              }`}
+              className={`py-2 px-4 text-sm font-medium transition-colors ${activeTab === tab
+                ? 'border-b-2 border-indigo-600 text-indigo-600'
+                : 'text-gray-600 hover:text-indigo-600'
+                }`}
             >
               {tab === 'profile' && <User className="inline mr-1" size={16} />}
               {tab === 'password' && <Lock className="inline mr-1" size={16} />}
@@ -229,10 +235,10 @@ const Settings: React.FC = () => {
               Guardar Cambios
             </button>
             <div className="text-center mt-8">
-            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Volver
-            </a>
-          </div>
+              <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Volver
+              </a>
+            </div>
           </form>
         )}
 
@@ -278,10 +284,10 @@ const Settings: React.FC = () => {
               Cambiar Contraseña
             </button>
             <div className="text-center mt-8">
-            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Volver
-            </a>
-          </div>
+              <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Volver
+              </a>
+            </div>
           </form>
         )}
 
@@ -292,14 +298,38 @@ const Settings: React.FC = () => {
             </h2>
             <button
               onClick={handleToggle2FA}
-              className={`py-2 px-6 rounded-lg text-white transition-colors ${
-                profile.is_2fa_enabled
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : 'bg-green-600 hover:bg-green-700'
-              }`}
+              disabled={loading2FA}
+              className={`py-2 px-6 rounded-lg text-white flex items-center justify-center gap-2 transition-colors
+    ${profile.is_2fa_enabled ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
+    ${loading2FA ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {profile.is_2fa_enabled ? 'Desactivar 2FA' : 'Activar 2FA'}
+              {loading2FA && (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  />
+                </svg>
+              )}
+              {loading2FA
+                ? profile.is_2fa_enabled ? 'Desactivando...' : 'Activando...'
+                : profile.is_2fa_enabled ? 'Desactivar 2FA' : 'Activar 2FA'}
             </button>
+
             {profile.is_2fa_enabled && otpUri && (
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-700 mb-2">
@@ -314,10 +344,10 @@ const Settings: React.FC = () => {
               </div>
             )}
             <div className="text-center mt-8">
-            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Volver
-            </a>
-          </div>
+              <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Volver
+              </a>
+            </div>
           </div>
         )}
       </div>
