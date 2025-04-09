@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface SubProcess {
   id: number;
@@ -65,7 +65,7 @@ const IndicatorComponent: React.FC = () => {
   useEffect(() => {
     const fetchIndicators = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/indicators/');
+        const response = await api.get('/indicators/');
         setIndicators(response.data);
         setLoading(false);
       } catch (err) {
@@ -77,7 +77,7 @@ const IndicatorComponent: React.FC = () => {
 
     const fetchSubProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/subprocesses/');
+        const response = await api.get('/subprocesses/');
         setSubProcesses(response.data);
       } catch (err) {
         console.error(err);
@@ -117,8 +117,8 @@ const IndicatorComponent: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(
-          `http://localhost:8000/api/indicators/${form.id}/`,
+        const response = await api.put(
+          `/indicators/${form.id}/`,
           formData
         );
         alert('Indicador actualizado exitosamente');
@@ -126,7 +126,7 @@ const IndicatorComponent: React.FC = () => {
           prev.map((sp) => (sp.id === response.data.id ? response.data : sp))
         );
       } else {
-        const response = await axios.post('http://localhost:8000/api/indicators/', formData);
+        const response = await api.post('/indicators/', formData);
         alert('Indicador creado exitosamente');
         setIndicators((prev) => [...prev, response.data]);
       }
@@ -170,7 +170,7 @@ const IndicatorComponent: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm('¿Está seguro de eliminar este indicador?'))  return;
       try {
-        await axios.delete(`http://localhost:8000/api/indicators/${id}/`);
+        await api.delete(`/indicators/${id}/`);
         setIndicators((prev) => prev.filter((indicator) => indicator.id !== id));
         alert('Indicador eliminado exitosamente');
       } catch (error) {
@@ -181,7 +181,7 @@ const IndicatorComponent: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/indicators/${id}/`, {
+      const response = await api.patch(`/indicators/${id}/`, {
         status: !currentStatus,
       });
       setIndicators((prev) =>

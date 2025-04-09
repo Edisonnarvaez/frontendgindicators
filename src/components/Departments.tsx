@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface Department {
   id: number;
@@ -34,7 +34,7 @@ const Departments: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/departments/');
+        const response = await api.get('/departments/');
         setDepartments(response.data);
         setLoading(false);
       } catch (err) {
@@ -47,7 +47,7 @@ const Departments: React.FC = () => {
 
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/companies/');
+        const response = await api.get('/companies/');
         setCompanies(response.data);
       } catch (err) {
         console.error(err);
@@ -78,13 +78,13 @@ const Departments: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(`http://localhost:8000/api/departments/${form.id}/`, formData);
+        const response = await api.put(`/departments/${form.id}/`, formData);
         setDepartments((prev) =>
           prev.map((department) => (department.id === response.data.id ? response.data : department))
         );
         alert('Area actualizada exitosamente');
       } else {
-        const response = await axios.post('http://localhost:8000/api/departments/', formData);
+        const response = await api.post('/departments/', formData);
         setDepartments((prev) => [...prev, response.data]);
         alert('Area creada exitosamente');
       }
@@ -107,7 +107,7 @@ const Departments: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar esta area?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/departments/${id}/`);
+      await api.delete(`/departments/${id}/`);
       setDepartments((prev) => prev.filter((department) => department.id !== id));
       alert('Area eliminada exitosamente');
     } catch (error) {
@@ -118,7 +118,7 @@ const Departments: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/departments/${id}/`, {
+      const response = await api.patch(`/departments/${id}/`, {
         status: !currentStatus,
       });
       setDepartments((prev) =>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface MacroProcess {
   id: number;
@@ -40,7 +40,7 @@ const ProcessComponent: React.FC = () => {
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/processes/');
+        const response = await api.get('/processes/');
         setProcesses(response.data);
       } catch (err) {
         console.error(err);
@@ -52,7 +52,7 @@ const ProcessComponent: React.FC = () => {
 
     const fetchMacroProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/macroprocesses/');
+        const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
       } catch (err) {
         console.error(err);
@@ -82,13 +82,13 @@ const ProcessComponent: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(`http://localhost:8000/api/processes/${form.id}/`, formData);
+        const response = await api.put(`/processes/${form.id}/`, formData);
         setProcesses((prev) =>
           prev.map((process) => (process.id === response.data.id ? response.data : process))
         );
         alert('Proceso actualizado exitosamente');
       } else {
-        const response = await axios.post('http://localhost:8000/api/processes/', formData);
+        const response = await api.post('/processes/', formData);
         setProcesses((prev) => [...prev, response.data]);
         alert('Proceso creado exitosamente');
       }
@@ -111,7 +111,7 @@ const ProcessComponent: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar este proceso?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/processes/${id}/`);
+      await api.delete(`/processes/${id}/`);
       setProcesses((prev) => prev.filter((process) => process.id !== id));
       alert('Proceso eliminado exitosamente');
     } catch (error) {
@@ -122,7 +122,7 @@ const ProcessComponent: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/processes/${id}/`, {
+      const response = await api.patch(`/processes/${id}/`, {
         status: !currentStatus,
       });
       setProcesses((prev) =>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface Company {
   id: number;
@@ -37,7 +37,7 @@ const Companies: React.FC = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/companies/');
+        const response = await api.get('/companies/');
         setCompanies(response.data);
         setLoading(false);
       } catch (err) {
@@ -72,13 +72,13 @@ const Companies: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(`http://localhost:8000/api/companies/${form.id}/`, formData);
+        const response = await api.put(`/companies/${form.id}/`, formData);
         setCompanies((prev) =>
           prev.map((company) => (company.id === response.data.id ? response.data : company))
         );
         alert('Empresa actualizada exitosamente');
       } else {
-        const response = await axios.post('http://localhost:8000/api/companies/', formData);
+        const response = await api.post('/companies/', formData);
         setCompanies((prev) => [...prev, response.data]);
         alert('Empresa creada exitosamente');
       }
@@ -101,7 +101,7 @@ const Companies: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar esta empresa?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/companies/${id}/`);
+      await api.delete(`/companies/${id}/`);
       setCompanies((prev) => prev.filter((company) => company.id !== id));
       alert('Epresa eliminada exitosamente');
     } catch (error) {
@@ -112,7 +112,7 @@ const Companies: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/companies/${id}/`, {
+      const response = await api.patch(`/companies/${id}/`, {
         status: !currentStatus,
       });
       setCompanies((prev) =>

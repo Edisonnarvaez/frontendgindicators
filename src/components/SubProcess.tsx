@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface Process {
   id: number;
@@ -42,7 +43,7 @@ const SubProcessComponent: React.FC = () => {
   useEffect(() => {
     const fetchSubProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/subprocesses/');
+        const response = await api.get('/subprocesses/');
         setSubProcesses(response.data);
         setLoading(false);
       } catch (err) {
@@ -54,7 +55,7 @@ const SubProcessComponent: React.FC = () => {
 
     const fetchProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/processes/');
+        const response = await api.get('/processes/');
         setProcesses(response.data);
       } catch (err) {
         console.error(err);
@@ -91,8 +92,8 @@ const SubProcessComponent: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(
-          `http://localhost:8000/api/subprocesses/${form.id}/`,
+        const response = await api.put(
+          `/subprocesses/${form.id}/`,
           formData
         );
         alert('SubProceso actualizado exitosamente');
@@ -100,7 +101,7 @@ const SubProcessComponent: React.FC = () => {
           prev.map((sp) => (sp.id === response.data.id ? response.data : sp))
         );
       } else {
-        const response = await axios.post('http://localhost:8000/api/subprocesses/', formData);
+        const response = await api.post('/subprocesses/', formData);
         alert('SubProceso creado exitosamente');
         setSubProcesses((prev) => [...prev, response.data]);
       }
@@ -132,7 +133,7 @@ const SubProcessComponent: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar este subproceso?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/subprocesses/${id}/`);
+      await api.delete(`/subprocesses/${id}/`);
       setSubProcesses((prev) => prev.filter((subprocess) => subprocess.id !== id));
       alert('Subproceso eliminado exitosamente');
     } catch (error) {
@@ -143,7 +144,7 @@ const SubProcessComponent: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/subprocesses/${id}/`, {
+      const response = await api.patch(`/subprocesses/${id}/`, {
         status: !currentStatus,
       });
       setSubProcesses((prevSubProcesses) =>

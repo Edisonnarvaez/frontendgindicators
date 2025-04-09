@@ -1,9 +1,9 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { Lock, User, Key, Shield } from 'lucide-react';
 import QRCode from 'qrcode.react';
+import api from '../api';
 
 // Interfaces ajustadas al JSON recibido
 interface Profile {
@@ -67,7 +67,7 @@ const Settings: React.FC = () => {
   const fetchProfile = async () => {
     console.log('Token:', token);
     try {
-      const response = await axios.get<Profile>('http://localhost:8000/api/users/me/', {
+      const response = await api.get<Profile>('/users/me/', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile({ ...response.data, is_2fa_enabled: response.data.is_2fa_enabled ?? false });
@@ -80,8 +80,8 @@ const Settings: React.FC = () => {
   const handleProfileUpdate = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        'http://localhost:8000/api/users/me/',
+      const response = await api.put(
+        '/users/me/',
         {
           firstName: profile.firstName,
           lastName: profile.lastName,
@@ -109,8 +109,8 @@ const Settings: React.FC = () => {
       return;
     }
     try {
-      await axios.post(
-        'http://localhost:8000/api/users/change_password/',
+      await api.post(
+        '/users/change_password/',
         {
           current_password: password.current,
           new_password: password.new,
@@ -128,8 +128,8 @@ const Settings: React.FC = () => {
   const handleToggle2FA = async () => {
     setLoading2FA(true);
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/users/2fa/toggle/',
+      const response = await api.post(
+        '/users/2fa/toggle/',
         { enable_2fa: !profile.is_2fa_enabled },
         { headers: { Authorization: `Bearer ${token}` } }
       );

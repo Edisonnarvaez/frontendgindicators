@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Layout from "./Layout";
+import api from '../api';
 
 interface Headquarters {
   id: number;
@@ -52,9 +52,9 @@ const ResultComponent: React.FC = () => {
     const fetchData = async () => {
       try {
         const [resultsRes, indicatorsRes, headquartersRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/results/"),
-          axios.get("http://localhost:8000/api/indicators/"),
-          axios.get("http://localhost:8000/api/headquarters/"),
+          api.get("/results/"),
+          api.get("/indicators/"),
+          api.get("/headquarters/"),
         ]);
 
         setResults(resultsRes.data);
@@ -85,13 +85,13 @@ const ResultComponent: React.FC = () => {
     try {
       const formData = { ...form, user: 1 }; // Ajusta el usuario según sea necesario.
       if (isEditing && form.id) {
-        const response = await axios.put(`http://localhost:8000/api/results/${form.id}/`, formData);
+        const response = await api.put(`/results/${form.id}/`, formData);
         setResults((prev) =>
           prev.map((result) => (result.id === response.data.id ? response.data : result))
         );
         alert("Resultado actualizado exitosamente.");
       } else {
-        const response = await axios.post("http://localhost:8000/api/results/", formData);
+        const response = await api.post("/results/", formData);
         setResults((prev) => [...prev, response.data]);
         alert("Resultado creado exitosamente.");
       }
@@ -133,7 +133,7 @@ const handleEdit = (result: Result) => {
   const handleDelete = async (id: number) => {
     if (window.confirm("¿Está seguro de eliminar este resultado?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/results/${id}/`);
+        await api.delete(`/results/${id}/`);
         setResults((prev) => prev.filter((r) => r.id !== id));
         alert("Resultado eliminado exitosamente.");
       } catch (err) {

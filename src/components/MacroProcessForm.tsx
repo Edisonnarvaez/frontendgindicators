@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 const MacroProcessForm: React.FC = () => {
   const [form, setForm] = useState({
@@ -21,7 +21,7 @@ const MacroProcessForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/macroprocesses/', form);
+      const response = await api.post('/macroprocesses/', form);
       if (response.status === 201) {
         alert('Macroproceso creado exitosamente');
         setIsOpen(false); // Cierra el modal después de enviar el formulario

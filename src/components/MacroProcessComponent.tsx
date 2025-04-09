@@ -1,7 +1,7 @@
 // src/components/MacroProcessComponent.tsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout'; // Si tienes un componente Layout
+import api from '../api';
 
 interface MacroProcess {
   id: number;
@@ -21,7 +21,7 @@ const MacroProcessComponent: React.FC = () => {
   useEffect(() => {
     const fetchMacroProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/macroprocesses/');
+        const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
         setLoading(false);
       } catch (err) {

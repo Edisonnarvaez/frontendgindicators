@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface Department {
   id: number;
@@ -40,7 +40,7 @@ const MacroProcessComponent: React.FC = () => {
   useEffect(() => {
     const fetchMacroProcesses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/macroprocesses/');
+        const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
         setLoading(false);
       } catch (err) {
@@ -52,7 +52,7 @@ const MacroProcessComponent: React.FC = () => {
 
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/departments/');
+        const response = await api.get('/departments/');
         setDepartments(response.data);
       } catch (err) {
         console.error(err);
@@ -92,8 +92,8 @@ const MacroProcessComponent: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(
-          `http://localhost:8000/api/macroprocesses/${form.id}/`,
+        const response = await api.put(
+          `/macroprocesses/${form.id}/`,
           formData
         );
         alert('Macroproceso actualizado exitosamente');
@@ -101,7 +101,7 @@ const MacroProcessComponent: React.FC = () => {
           prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
         );
       } else {
-        const response = await axios.post('http://localhost:8000/api/macroprocesses/', formData);
+        const response = await api.post('/macroprocesses/', formData);
         alert('Macroproceso creado exitosamente');
         setMacroProcesses((prev) => [...prev, response.data]);
       }
@@ -132,7 +132,7 @@ const MacroProcessComponent: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar este macroproceso?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/macroprocesses/${id}/`);
+      await api.delete(`/macroprocesses/${id}/`);
       setMacroProcesses((prev) => prev.filter((macroProcess) => macroProcess.id !== id));
       alert('Macroproceso eliminado exitosamente');
     } catch (error) {
@@ -143,7 +143,7 @@ const MacroProcessComponent: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/macroprocesses/${id}/`, {
+      const response = await api.patch(`/macroprocesses/${id}/`, {
         status: !currentStatus,
       });
       setMacroProcesses((prevMacroProcesses) =>
