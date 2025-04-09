@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from './Layout';
+import api from '../api';
 
 interface User {
   id: number;
@@ -62,7 +63,7 @@ const Users: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/users/');
+        const response = await api.get('/users/');
         setUsers(response.data);
         setLoading(false);
       } catch (err) {
@@ -74,7 +75,7 @@ const Users: React.FC = () => {
 
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/departments/');
+        const response = await api.get('/departments/');
         setDepartments(response.data);
       } catch (err) {
         console.error(err);
@@ -84,7 +85,7 @@ const Users: React.FC = () => {
 
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/companies/');
+        const response = await api.get('/companies/');
         setCompanies(response.data);
       } catch (err) {
         console.error(err);
@@ -94,7 +95,7 @@ const Users: React.FC = () => {
 
     const fetchRoles = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/roles/');
+        const response = await api.get('/roles/');
         setRoles(response.data);
       } catch (err) {
         console.error(err);
@@ -142,16 +143,13 @@ const Users: React.FC = () => {
 
     try {
       if (isEditing) {
-        const response = await axios.put(
-          `http://localhost:8000/api/users/${form.id}/`,
-          formData
-        );
+        const response = await api.post('/users/', formData);
         alert('Usuario actualizado exitosamente');
         setUsers((prev) =>
           prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
         );
       } else {
-        const response = await axios.post('http://localhost:8000/api/users/', formData);
+        const response = await api.put(`/users/${form.id}/`, formData);
         alert('Usuario creado exitosamente');
         setUsers((prev) => [...prev, response.data]);
       }
@@ -187,7 +185,7 @@ const Users: React.FC = () => {
     if (!window.confirm('¿Está seguro de eliminar este usuario?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/users/${id}/`);
+      await api.delete(`/users/${id}/`);
       setUsers((prev) => prev.filter((user) => user.id !== id));
       alert('Usuario eliminado exitosamente');
     } catch (error) {
@@ -198,7 +196,7 @@ const Users: React.FC = () => {
 
   const handleToggleStatus = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/api/users/${id}/`, {
+      const response = await api.patch(`/users/${id}/`, {
         status: !currentStatus,
       });
       setUsers((prevUsers) =>

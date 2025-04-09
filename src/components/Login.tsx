@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { setToken } from '../store/slices/authSlice';
+import { setTokens } from '../store/slices/authSlice';
 import axios from 'axios';
 import { Lock } from 'lucide-react';
+
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -75,10 +76,9 @@ const Login: React.FC = () => {
   };
 
   const handleLoginSuccess = (data: any) => {
-    const token = data.access;
-    if (token) {
-      dispatch(setToken(token));
-      if (rememberMe) localStorage.setItem('token', token);
+    const { access, refresh } = data;
+    if (access && refresh) {
+      dispatch(setTokens({ access, refresh }));
       navigate('/');
     } else {
       setError('No se recibió el token de la API');
