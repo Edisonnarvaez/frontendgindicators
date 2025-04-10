@@ -144,7 +144,7 @@ const Users: React.FC = () => {
     try {
       //let response;
       if (isEditing) {
-        const response = await api.put('/users/${form.id}/', formData);
+        const response = await api.put(`/users/${form.id}/`, formData);
         alert('Usuario actualizado exitosamente');
         setUsers((prev) =>
           prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
