@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer
@@ -82,13 +82,13 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const macroRes = await axios.get('http://localhost:8000/api/macroprocesses/');
-        const processRes = await axios.get('http://localhost:8000/api/processes/');
-        const subProcessRes = await axios.get('http://localhost:8000/api/subprocesses/');
-        const indicatorRes = await axios.get('http://localhost:8000/api/indicators/');
-        const resultRes = await axios.get('http://localhost:8000/api/results/');
-        const departmentRes = await axios.get('http://localhost:8000/api/departments/');
-        const headquartersRes = await axios.get('http://localhost:8000/api/headquarters/');
+        const macroRes = await api.get('http://localhost:8000/api/macroprocesses/');
+        const processRes = await api.get('http://localhost:8000/api/processes/');
+        const subProcessRes = await api.get('http://localhost:8000/api/subprocesses/');
+        const indicatorRes = await api.get('http://localhost:8000/api/indicators/');
+        const resultRes = await api.get('http://localhost:8000/api/results/');
+        const departmentRes = await api.get('http://localhost:8000/api/departments/');
+        const headquartersRes = await api.get('http://localhost:8000/api/headquarters/');
         
         setMacroProcesses(macroRes.data);
         setProcesses(processRes.data);
