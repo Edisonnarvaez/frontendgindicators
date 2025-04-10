@@ -138,17 +138,19 @@ const Users: React.FC = () => {
       user: 1, 
       password: form.password || undefined, // Solo enviar si está presente
     };
+    delete formData.lastLogin;
     console.log(formData);
 
     try {
+      //let response;
       if (isEditing) {
-        const response = await api.post('/users/', formData);
+        const response = await api.put('/users/${form.id}/', formData);
         alert('Usuario actualizado exitosamente');
         setUsers((prev) =>
           prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
         );
       } else {
-        const response = await api.put(`/users/${form.id}/`, formData);
+        const response = await api.post(`/users/`, formData);
         alert('Usuario creado exitosamente');
         setUsers((prev) => [...prev, response.data]);
       }
@@ -164,14 +166,23 @@ const Users: React.FC = () => {
         department: 0,
         role: 0,
         status: true,
-        lastLogin: '',
+        //lastLogin: '',
         password: '',
       });
       setIsEditing(false);
-    } catch (error) {
-      console.error('Error al guardar los datos', error);
-      alert('Error al crear o actualizar el usuario');
-    }
+    } //catch (error) {
+      //console.error('Error al guardar los datos', error);
+      //alert('Error al crear o actualizar el usuario');
+      catch (error: any) {
+        if (error.response && error.response.data) {
+          console.error('Errores del backend:', error.response.data);
+          alert(`Error: ${JSON.stringify(error.response.data)}`);
+        } else {
+          console.error('Error inesperado:', error);
+          alert('Error inesperado al crear o actualizar el usuario');
+        }
+      }
+    //}
   };
 
   const handleEdit = (user: User) => {
