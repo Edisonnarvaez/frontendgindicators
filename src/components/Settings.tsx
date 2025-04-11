@@ -5,6 +5,8 @@ import { Lock, User, Key, Shield } from 'lucide-react';
 import QRCode from 'qrcode.react';
 import api from '../api';
 
+import { useDispatch } from 'react-redux';
+import { setUserProfile } from '../store/slices/userSlice';
 // Interfaces ajustadas al JSON recibido
 interface Profile {
   id: number;
@@ -58,6 +60,7 @@ const Settings: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [loading2FA, setLoading2FA] = useState(false);
+  const dispatch = useDispatch();
 
 
   useEffect(() => {
@@ -71,6 +74,7 @@ const Settings: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile({ ...response.data, is_2fa_enabled: response.data.is_2fa_enabled ?? false });
+      dispatch(setUserProfile(response.data)); // 👈 Aquí lo guardas en Redux
     } catch (err: any) {
       console.error('Error:', err.response?.data);
       setError('Error al cargar el perfil');

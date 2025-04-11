@@ -73,6 +73,9 @@ const Departments: React.FC = () => {
     const formData = {
       ...form,
       user: 1,
+      creationDate: form.creationDate instanceof Date
+        ? form.creationDate.toISOString().split('T')[0]
+        : form.creationDate,
       //creationDate: form.creationDate ? form.creationDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0], // Cambiado a ISO String
     };
 
@@ -220,8 +223,8 @@ const Departments: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
-                  
-                  
+
+
                 <select
                   name="status"
                   value={form.status ? 'true' : 'false'}
@@ -258,7 +261,6 @@ const Departments: React.FC = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de creacion</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
@@ -271,18 +273,31 @@ const Departments: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{department.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{department.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{department.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{new Date(department.creationDate).toLocaleDateString()}</td> {/* Formato de fecha legible */}
-                  <td className="px-6 py-4 whitespace-nowrap">{department.status ? 'Activo' : 'Inactivo'}</td> {/* Booleano como texto */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {new Date(department.creationDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {department.status ? 'Activo' : 'Inactivo'}
+                  </td>
                   <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(department)}>
+                    <button
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEdit(department)}
+                    >
                       Editar
                     </button>
-                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(department.id)}>
+                    <button
+                      className="ml-4 text-red-600 hover:text-red-800"
+                      onClick={() => handleDelete(department.id)}
+                    >
                       Eliminar
                     </button>
                     <button
-                      className={`ml-4 ${department.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
-                      onClick={() => handleToggleStatus(department.id, department.status)}
+                      className={`ml-4 ${department.status ? 'text-yellow-600' : 'text-green-600'
+                        } hover:text-yellow-800`}
+                      onClick={() =>
+                        handleToggleStatus(department.id, department.status)
+                      }
                     >
                       {department.status ? 'Inactivar' : 'Activar'}
                     </button>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./Layout";
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface Headquarters {
   id: number;
@@ -47,6 +49,8 @@ const ResultComponent: React.FC = () => {
   const [indicatorFilter, setIndicatorFilter] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +87,8 @@ const ResultComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const formData = { ...form, user: 1 }; // Ajusta el usuario según sea necesario.
+      //const formData = { ...form, user: 1 }; // Ajusta el usuario según sea necesario.
+      const formData = { ...form, user: userId };
       if (isEditing && form.id) {
         const response = await api.put(`/results/${form.id}/`, formData);
         setResults((prev) =>
