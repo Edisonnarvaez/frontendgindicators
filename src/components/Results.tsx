@@ -66,6 +66,10 @@ const ResultComponent: React.FC = () => {
         setHeadquarters(headquartersRes.data);
         setFilteredResults(resultsRes.data);
         setLoading(false);
+        console.log("Resultados:", resultsRes.data);
+        console.log("Indicadores:", indicatorsRes.data);
+        console.log("Sedes:", headquartersRes.data);  
+        
       } catch (err) {
         console.error(err);
         setError("Error al cargar los datos.");
