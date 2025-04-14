@@ -4,8 +4,8 @@ import FilterSelect from "../Shared/FilterSelect";
 import IndicatorBarChart from "./IndicatorBarChart";
 import TimeSeriesChart from "./TimeSeriesChart";
 import IndicatorTable from "./IndicatorTable";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import SummaryCards from "./SummaryCards";
+
 
 export default function DashboardPage() {
     const { data, loading } = useResultsData();
@@ -19,15 +19,6 @@ export default function DashboardPage() {
     const indicadores = [...new Set(data.map((item) => item.indicatorName))];
     const unidades = [...new Set(data.map((item) => item.measurementUnit))];
     const frecuencias = [...new Set(data.map((item) => item.measurementFrequency))];
-
-    const exportToExcel = (data: any[]) => {
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Resultados");
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const file = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(file, "resultados.xlsx");
-    };
 
 
     const filteredData = useMemo(() => {
@@ -52,14 +43,9 @@ export default function DashboardPage() {
                 <FilterSelect label="Frecuencia" options={frecuencias} value={selectedFrecuencia} onChange={setSelectedFrecuencia} />
             </div>
 
+            <SummaryCards data={filteredData} />
             <IndicatorBarChart data={filteredData} loading={loading} />
             <TimeSeriesChart data={filteredData} loading={loading} />
-            <button
-                onClick={() => exportToExcel(data)}
-                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-                Exportar a Excel
-            </button>
             <IndicatorTable data={filteredData} loading={loading} />
         </div>
     );
