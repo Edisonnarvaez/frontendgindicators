@@ -5,6 +5,9 @@ import IndicatorBarChart from "./IndicatorBarChart";
 import TimeSeriesChart from "./TimeSeriesChart";
 import IndicatorTable from "./IndicatorTable";
 import SummaryCards from "./SummaryCards";
+import CompliancePieChart from "./CompliancePieChart";
+import WorstIndicatorsChart from "./WorstIndicatorsChart";
+
 
 
 export default function DashboardPage() {
@@ -46,6 +49,8 @@ export default function DashboardPage() {
             <SummaryCards data={filteredData} />
             <IndicatorBarChart data={filteredData} loading={loading} />
             <TimeSeriesChart data={filteredData} loading={loading} />
+            <CompliancePieChart data={filteredData} loading={loading} />
+            <WorstIndicatorsChart data={filteredData} loading={loading} />
             <IndicatorTable data={filteredData} loading={loading} />
         </div>
     );

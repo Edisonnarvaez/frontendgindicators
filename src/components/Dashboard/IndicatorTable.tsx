@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import { exportToExcel, exportToPDF } from "../../utils/exportUtils";
+import IndicatorDetailModal from "./IndicatorDetailModal";
+
 
 interface Props {
     data: any[];
@@ -26,9 +28,12 @@ export default function IndicatorTable({ data, loading }: Props) {
     if (loading) return <p className="text-center">Cargando tabla...</p>;
     if (data.length === 0) return <p className="text-center">No hay datos para mostrar.</p>;
 
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
+
+
     return (
         <div className="overflow-x-auto bg-white p-4 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Tabla de Resultados</h2>
             <div className="flex justify-end gap-4 mb-4">
                 <button
                     onClick={() => exportToExcel(data)}
@@ -43,10 +48,13 @@ export default function IndicatorTable({ data, loading }: Props) {
                     Exportar a PDF
                 </button>
             </div>
+
+            <h2 className="text-lg font-semibold mb-4">Tabla de Resultados</h2>
             <table className="min-w-full text-sm text-left">
 
                 <thead className="bg-gray-100 border-b font-medium">
                     <tr>
+
                         <th className="px-4 py-2">Indicador</th>
                         <th className="px-4 py-2">Sede</th>
                         <th className="px-4 py-2">Resultado</th>
@@ -61,7 +69,17 @@ export default function IndicatorTable({ data, loading }: Props) {
                         const cumple = item.calculatedValue >= item.target;
                         return (
                             <tr key={idx} className="border-b hover:bg-gray-50">
-                                <td className="px-4 py-2">{item.indicatorName}</td>
+                                <td className="px-4 py-2">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedIndicator(item);
+                                            setModalOpen(true);
+                                        }}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {item.indicatorName}
+                                    </button>
+                                </td>
                                 <td className="px-4 py-2">{item.headquarterName}</td>
                                 <td className="px-4 py-2">{item.calculatedValue.toFixed(2)}</td>
                                 <td className="px-4 py-2">{item.target.toFixed(2)}</td>
@@ -78,7 +96,16 @@ export default function IndicatorTable({ data, loading }: Props) {
                         );
                     })}
                 </tbody>
+
             </table>
+            <IndicatorDetailModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                indicator={selectedIndicator}
+                results={data}
+            />
+
+
         </div>
     );
 }
