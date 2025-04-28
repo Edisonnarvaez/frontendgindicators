@@ -19,6 +19,7 @@ import Results from './components/Results';
 import ResetPassword from './components/ResetPassword';   // El nuevo componente que crearemos
 import Settings from './components/Settings';
 import UserInitializer from './components/UserInitializer';
+import Headquarters from './components/Headquarters';
 //import DashboardPage from "./components/Dashboard/DashboardPage";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
               <Route path="/companies" element={<PrivateRoute><Companies /></PrivateRoute>} />
+              <Route path="/headquarters" element={<PrivateRoute><Headquarters /></PrivateRoute>} />
               <Route path="/departments" element={<PrivateRoute><Departments /></PrivateRoute>} />
               <Route path="/indicators" element={<PrivateRoute><Indicators /></PrivateRoute>} />
               <Route path="/macroprocess" element={<PrivateRoute><MacroProcess /></PrivateRoute>} />
