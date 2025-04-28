@@ -196,6 +196,7 @@ const SubProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="name"
+                      placeholder='Nombre del SubProceso'
                       value={form.name || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -207,6 +208,7 @@ const SubProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="description"
+                      placeholder='Descripción del SubProceso'
                       value={form.description || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -218,6 +220,7 @@ const SubProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="code"
+                      placeholder='Código del SubProceso'
                       value={form.code || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -229,6 +232,7 @@ const SubProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="version"
+                      placeholder='Versión del SubProceso'
                       value={form.version || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -240,6 +244,7 @@ const SubProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="author"
+                      placeholder='Autor del SubProceso'
                       value={form.author || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -303,6 +308,10 @@ const SubProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Versión</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proceso</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>            
@@ -312,6 +321,10 @@ const SubProcessComponent: React.FC = () => {
                   <td className="px-6 py-4">{subProcess.id}</td>
                   <td className="px-6 py-4">{subProcess.name}</td>
                   <td className="px-6 py-4">{subProcess.description}</td>
+                  <td className="px-6 py-4">{subProcess.code}</td>
+                  <td className="px-6 py-4">{subProcess.version}</td>
+                  <td className="px-6 py-4">{processes.find(p => p.id === subProcess.process)?.name}</td>
+                  <td className="px-6 py-4">{subProcess.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4">
                     <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(subProcess)}>
                       Editar

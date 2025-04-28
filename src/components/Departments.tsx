@@ -8,7 +8,7 @@ interface Department {
   departmentCode: string;
   company: string;
   description: string;
-  creationDate: Date;  // Cambiado a string
+  //creationDate: Date;  // Cambiado a string
   status: boolean;
 }
 
@@ -25,7 +25,7 @@ const Departments: React.FC = () => {
     departmentCode: '',
     company: '',
     description: '',
-    creationDate: new Date(),  // Cambiado a Date
+    //creationDate: new Date(),  // Cambiado a Date
     //creationDate: '',
     status: true,
   });
@@ -73,9 +73,9 @@ const Departments: React.FC = () => {
     const formData = {
       ...form,
       user: 1,
-      creationDate: form.creationDate instanceof Date
-        ? form.creationDate.toISOString().split('T')[0]
-        : form.creationDate,
+      //creationDate: form.creationDate instanceof Date
+      //  ? form.creationDate.toISOString().split('T')[0]
+      //  : form.creationDate,
       //creationDate: form.creationDate ? form.creationDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0], // Cambiado a ISO String
     };
 
@@ -141,7 +141,7 @@ const Departments: React.FC = () => {
       departmentCode: '',
       company: '',
       description: '',
-      creationDate: new Date(),  // Cambiado a Date
+      //creationDate: new Date(),  // Cambiado a Date
       //creationDate: ,
       status: true,
     });
@@ -174,67 +174,76 @@ const Departments: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Area</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="nombre"
-                  value={form.name || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                <input
-                  type="text"
-                  name="departmentCode"
-                  placeholder="Codigo de area"
-                  value={form.departmentCode || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                <select
-                  name="company"
-                  value={form.company || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                >
-                  <option value="">Seleccione Empresa</option>
-                  {companies.map((company) => (
-                    <option key={company.id} value={company.id}>
-                      {company.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="description"
-                  placeholder="Descripcion"
-                  value={form.description || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                <input
-                  type="date"
-                  name="creationDate"
-                  value={form.creationDate?.toISOString().split('T')[0] || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
+                <div>
+                  <label htmlFor="habilitationCode" className="block text-sm font-medium">Nombre del Area</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="nombre"
+                    value={form.name || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="departmentCode" className="block text-sm font-medium">Codigo de Area</label>
+                  <input
+                    type="text"
+                    name="departmentCode"
+                    placeholder="Codigo de area"
+                    value={form.departmentCode || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
+                  <select
+                    name="company"
+                    value={form.company || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="">Seleccione Empresa</option>
+                    {companies.map((company) => (
+                      <option key={company.id} value={company.id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium">Descripcion</label>
+                  <input
+                    type="text"
+                    name="description"
+                    placeholder="Descripcion"
+                    value={form.description || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="status" className="block text-sm font-medium">Estado</label>
 
 
-                <select
-                  name="status"
-                  value={form.status ? 'true' : 'false'}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                >
-                  <option value="true">Activo</option>
-                  <option value="false">Inactivo</option>
-                </select>
+                  <select
+                    name="status"
+                    value={form.status ? 'true' : 'false'}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
+                  </select>
+
+                </div>
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
@@ -261,8 +270,8 @@ const Departments: React.FC = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripcion</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de creacion</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
@@ -272,10 +281,8 @@ const Departments: React.FC = () => {
                 <tr key={department.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{department.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{department.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{department.departmentCode}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{department.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {new Date(department.creationDate).toLocaleDateString()}
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {department.status ? 'Activo' : 'Inactivo'}
                   </td>

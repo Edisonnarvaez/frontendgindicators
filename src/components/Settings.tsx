@@ -168,7 +168,7 @@ const Settings: React.FC = () => {
         </h1>
 
         <div className="flex space-x-4 border-b mb-6">
-          {['profile', 'password', '2fa'].map((tab) => (
+          {['perfil', 'contraseña', '2fa'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as 'profile' | 'password' | '2fa')}
@@ -177,8 +177,8 @@ const Settings: React.FC = () => {
                 : 'text-gray-600 hover:text-indigo-600'
                 }`}
             >
-              {tab === 'profile' && <User className="inline mr-1" size={16} />}
-              {tab === 'password' && <Lock className="inline mr-1" size={16} />}
+              {tab === 'perfil' && <User className="inline mr-1" size={16} />}
+              {tab === 'contraseña' && <Lock className="inline mr-1" size={16} />}
               {tab === '2fa' && <Key className="inline mr-1" size={16} />}
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>

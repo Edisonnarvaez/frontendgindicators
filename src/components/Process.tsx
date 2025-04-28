@@ -173,6 +173,8 @@ const ProcessComponent: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Proceso</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+              <label htmlFor="habilitationCode" className="block text-sm font-medium">Nombre del Proceso</label>
                 <input
                   type="text"
                   name="name"
@@ -182,6 +184,9 @@ const ProcessComponent: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+              </div>
+              <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Descripción</label>
                 <input
                   type="text"
                   name="description"
@@ -191,6 +196,9 @@ const ProcessComponent: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+              </div>
+              <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Código</label>
                 <input
                   type="text"
                   name="code"
@@ -200,6 +208,9 @@ const ProcessComponent: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+              </div>
+              <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Versión</label>
                 <input
                   type="text"
                   name="version"
@@ -209,6 +220,9 @@ const ProcessComponent: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+              </div>
+              <div>
+              <label htmlFor="macroProcess" className="block text-sm font-medium">MacroProceso</label>
                 <select
                   name="macroProcess"
                   value={form.macroProcess || 0}
@@ -223,6 +237,9 @@ const ProcessComponent: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                </div>
+              <div>
+                <label htmlFor="status" className="block text-sm font-medium">Estado</label>
                 <select
                   name="status"
                   value={form.status ? 'true' : 'false'}
@@ -232,6 +249,8 @@ const ProcessComponent: React.FC = () => {
                   <option value="true">Activo</option>
                   <option value="false">Inactivo</option>
                 </select>
+              </div>
+              
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
@@ -259,6 +278,8 @@ const ProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Versión</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
@@ -269,6 +290,8 @@ const ProcessComponent: React.FC = () => {
                   <td className="px-6 py-4">{process.id}</td>
                   <td className="px-6 py-4">{process.name}</td>
                   <td className="px-6 py-4">{process.description}</td>
+                  <td className="px-6 py-4">{process.code}</td>
+                  <td className="px-6 py-4">{process.version}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{process.status ? 'Activo' : 'Inactivo'}</td> 
                   <td className="px-6 py-4">
                     <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(process)}>

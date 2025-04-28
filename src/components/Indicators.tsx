@@ -246,6 +246,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="name"
+                      placeholder="Nombre del indicador"
                       value={form.name || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -257,6 +258,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="description"
+                      placeholder="Descripción del indicador"
                       value={form.description || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -268,6 +270,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="code"
+                      placeholder="Código del indicador"
                       value={form.code || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -279,6 +282,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="version"
+                      placeholder="Versión del indicador"
                       value={form.version || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -307,6 +311,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="measurementUnit"
+                      placeholder="Unidad de medida del indicador"
                       value={form.measurementUnit || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -318,6 +323,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="numerator"
+                      placeholder="Numerador del indicador"
                       value={form.numerator || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -329,6 +335,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="numeratorResponsible"
+                      placeholder="Responsable del numerador"
                       value={form.numeratorResponsible || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -340,6 +347,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="numeratorSource"
+                      placeholder="Fuente del numerador"
                       value={form.numeratorSource || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -351,6 +359,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="numeratorDescription"
+                      placeholder="Descripción del numerador"
                       value={form.numeratorDescription || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -362,6 +371,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="denominator"
+                      placeholder="Denominador del indicador"
                       value={form.denominator || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -373,6 +383,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="denominatorResponsible"
+                      placeholder="Responsable del denominador"
                       value={form.denominatorResponsible || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -384,6 +395,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="denominatorSource"
+                      placeholder="Fuente del denominador"
                       value={form.denominatorSource || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -395,6 +407,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="denominatorDescription"
+                      placeholder="Descripción del denominador"
                       value={form.denominatorDescription || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -406,6 +419,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="target"
+                      placeholder="Meta del indicador"
                       value={form.target || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -417,6 +431,7 @@ const IndicatorComponent: React.FC = () => {
                     <input
                       type="text"
                       name="author"
+                      placeholder="Autor del indicador"
                       value={form.author || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -496,8 +511,16 @@ const IndicatorComponent: React.FC = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Numerador</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Denominador</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meta</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unidad de medida</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subproceso</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                
               </tr>
             </thead>            
             <tbody className="bg-white divide-y divide-gray-200">
@@ -505,7 +528,14 @@ const IndicatorComponent: React.FC = () => {
                 <tr key={indicator.id}>
                   <td className="px-6 py-4">{indicator.id}</td>
                   <td className="px-6 py-4">{indicator.name}</td>
+                  <td className="px-6 py-4">{indicator.code}</td>
                   <td className="px-6 py-4">{indicator.description}</td>
+                  <td className="px-6 py-4">{indicator.numerator}</td>
+                  <td className="px-6 py-4">{indicator.denominator}</td>
+                  <td className="px-6 py-4">{indicator.target}</td>
+                  <td className="px-6 py-4">{indicator.measurementUnit}</td>
+                  <td className="px-6 py-4">{subProcesses.find(sp => sp.id === indicator.subProcess)?.name}</td>
+                  <td className="px-6 py-4">{indicator.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4">
                     <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(indicator)}>
                       Editar

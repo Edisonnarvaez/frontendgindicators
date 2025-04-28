@@ -313,7 +313,7 @@ const Headquarter: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.address}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.habilitationDate}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.closingDate}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{headquarter.status}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{headquarter.status ? 'Activo' : 'Inactivo'}</td>
                                     <td className="px-6 py-4">
                                         <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(headquarter)}>
                                             Editar

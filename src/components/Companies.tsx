@@ -169,6 +169,8 @@ const Companies: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
               <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Empresa</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Nombre de la empresa</label>
                 <input
                   type="text"
                   name="name"
@@ -178,6 +180,9 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">NIT de la empresa</label>
                 <input
                   type="text"
                   name="nit"
@@ -187,6 +192,9 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Representante legal</label>
                 <input
                   type="text"
                   name="legalRepresentative"
@@ -196,6 +204,9 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Telefono de la empresa</label>
                 <input
                   type="text"
                   name="phone"
@@ -206,6 +217,9 @@ const Companies: React.FC = () => {
                   required
 
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Direccion de la empresa</label>
                 <input
                   type="text"
                   name="address"
@@ -215,6 +229,9 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Correo electronico del representante legal</label>
                 <input
                   type="email"
                   name="contactEmail"
@@ -224,6 +241,9 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
                 />
+                </div>
+                <div>
+                <label htmlFor="habilitationCode" className="block text-sm font-medium">Fecha de fundacion de la empresa</label>
                 <input
                   type="date"
                   name="foundationDate"
@@ -233,7 +253,10 @@ const Companies: React.FC = () => {
                   className="w-full p-2 border rounded"
                   required
 
-                />              
+                />
+                </div>
+                <div>
+                <label htmlFor="status" className="block text-sm font-medium">Estado</label>              
                 <select
                   name="status"
                   value={form.status ? 'true' : 'false'}
@@ -243,6 +266,7 @@ const Companies: React.FC = () => {
                   <option value="true">Activo</option>
                   <option value="false">Inactivo</option>
                 </select>
+                </div>
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
@@ -286,7 +310,7 @@ const Companies: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{company.legalRepresentative}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{company.phone}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{company.address}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{company.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{company.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4">
                     <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(company)}>
                       Editar

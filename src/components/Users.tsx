@@ -441,7 +441,7 @@ const Users: React.FC = () => {
                   <td className="px-6 py-4 text-sm text-gray-500">{user.lastName}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.role}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.status}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{user.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <button
                       className="text-blue-600 hover:text-blue-800"
