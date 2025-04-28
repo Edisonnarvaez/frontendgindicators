@@ -256,7 +256,7 @@ const Users: React.FC = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
             <div className="flex items-center justify-center min-h-screen">
               <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
                 <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Usuario</h2>
@@ -267,6 +267,7 @@ const Users: React.FC = () => {
                     <input
                       type="text"
                       name="firstName"
+                      placeholder='Nombres'
                       value={form.firstName || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -278,6 +279,7 @@ const Users: React.FC = () => {
                     <input 
                       type="text"
                       name="lastName"
+                      placeholder='Apellidos'
                       value={form.lastName || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -289,6 +291,7 @@ const Users: React.FC = () => {
                     <input
                       type="text"
                       name="username"
+                      placeholder='Usuario'
                       value={form.username || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -300,6 +303,7 @@ const Users: React.FC = () => {
                     <input
                         type="password"
                         name="password"
+                        placeholder='Contraseña'
                         value={form.password || ''}
                         onChange={handleChange}
                         className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -311,6 +315,7 @@ const Users: React.FC = () => {
                     <input
                       type="email"
                       name="email"
+                      placeholder='Correo electrónico'
                       value={form.email || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -322,6 +327,7 @@ const Users: React.FC = () => {
                     <input
                       type="text"
                       name="phone"
+                      placeholder='Teléfono'
                       value={form.phone || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"

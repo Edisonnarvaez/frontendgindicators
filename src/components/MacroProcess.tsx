@@ -188,7 +188,7 @@ const MacroProcessComponent: React.FC = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
             <div className="flex items-center justify-center min-h-screen">
               <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
                 <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} MacroProceso</h2>
@@ -199,6 +199,7 @@ const MacroProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="name"
+                      placeholder='Nombre del macroproceso'
                       value={form.name || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -210,6 +211,7 @@ const MacroProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="description"
+                      placeholder='Descripción del macroproceso'
                       value={form.description || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -237,6 +239,7 @@ const MacroProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="code"
+                      placeholder='Código del macroproceso'
                       value={form.code || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -248,6 +251,7 @@ const MacroProcessComponent: React.FC = () => {
                     <input
                       type="text"
                       name="version"
+                      placeholder='Versión del macroproceso'
                       value={form.version || ''}
                       onChange={handleChange}
                       className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
@@ -295,6 +299,8 @@ const MacroProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
@@ -304,6 +310,10 @@ const MacroProcessComponent: React.FC = () => {
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{macroProcess.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.description}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {departments.find(dept => dept.id === macroProcess.department)?.name || 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.code}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <button
                       className="text-blue-600 hover:text-blue-800"

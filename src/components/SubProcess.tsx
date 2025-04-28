@@ -186,7 +186,7 @@ const SubProcessComponent: React.FC = () => {
         </button>
 
         {isModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
             <div className="flex items-center justify-center min-h-screen">
               <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
                 <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} SubProceso</h2>
