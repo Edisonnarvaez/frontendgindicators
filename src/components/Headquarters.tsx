@@ -8,6 +8,7 @@ interface Headquarter {
     id: number;
     name: string;
     habilitationCode: string;
+    company: string;
     departament: string;
     city: string;
     address: string;
@@ -15,6 +16,7 @@ interface Headquarter {
     closingDate: string;
     status: boolean;
 }
+
 
 const Headquarter: React.FC = () => {
     const [headquarters, setHeadquarters] = useState<Headquarter[]>([]);
@@ -28,6 +30,7 @@ const Headquarter: React.FC = () => {
     const [form, setForm] = useState<Partial<Headquarter>>({
         name: '',
         habilitationCode: '',
+        company: '',
         departament: '',
         city: '',
         address: '',
@@ -133,6 +136,7 @@ const Headquarter: React.FC = () => {
         setForm({
             name: '',
             habilitationCode: '',
+            company: '',
             departament: '',
             city: '',
             address: '',
@@ -192,6 +196,19 @@ const Headquarter: React.FC = () => {
                                     required
                                 />
                                 </div>
+                                <div>
+                                <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
+                                <input
+                                    type="text"
+                                    name="company"
+                                    placeholder='Empresa de la sede'
+                                    value={form.company || ''}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                    required
+                                />
+                                </div>
+
                                 <div>
                                 <label htmlFor="departament" className="block text-sm font-medium">Departamento</label>
                                 <input
@@ -293,6 +310,7 @@ const Headquarter: React.FC = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre de la sede</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo de habilitacion</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direccion</th>
@@ -308,6 +326,7 @@ const Headquarter: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.id}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.habilitationCode}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{headquarter.company}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.departament}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.city}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.address}</td>
