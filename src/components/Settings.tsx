@@ -33,7 +33,7 @@ interface Password {
 
 const Settings: React.FC = () => {
   const token = useSelector((state: RootState) => state.auth.token);
-  const [activeTab, setActiveTab] = useState<'profile' | 'password' | '2fa'>('profile');
+  const [activeTab, setActiveTab] = useState<'perfil' | 'contraseña' | '2fa'>('perfil');
   const [profile, setProfile] = useState<Profile>({
     id: 0,
     firstName: '',
@@ -171,7 +171,7 @@ const Settings: React.FC = () => {
           {['perfil', 'contraseña', '2fa'].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab as 'profile' | 'password' | '2fa')}
+              onClick={() => setActiveTab(tab as 'perfil' | 'contraseña' | '2fa')}
               className={`py-2 px-4 text-sm font-medium transition-colors ${activeTab === tab
                 ? 'border-b-2 border-indigo-600 text-indigo-600'
                 : 'text-gray-600 hover:text-indigo-600'
@@ -192,7 +192,7 @@ const Settings: React.FC = () => {
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{success}</div>
         )}
 
-        {activeTab === 'profile' && (
+        {activeTab === 'perfil' && (
           <form onSubmit={handleProfileUpdate} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -246,7 +246,7 @@ const Settings: React.FC = () => {
           </form>
         )}
 
-        {activeTab === 'password' && (
+        {activeTab === 'contraseña' && (
           <form onSubmit={handlePasswordChange} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
