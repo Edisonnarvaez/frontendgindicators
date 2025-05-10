@@ -156,7 +156,7 @@ const Companies: React.FC = () => {
   return (
     <Layout>
       <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Empresas</h1>
+        <h1 className="text-3xl font-bold mb-6">Empresa</h1>
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
           onClick={openModal}

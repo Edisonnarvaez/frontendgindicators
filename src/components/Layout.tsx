@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Link>
           <Link to="/companies" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Building className="mr-2" size={20} />
-            Empresas
+            Empresa
           </Link>
           <Link to="/headquarters" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <Building2 className="mr-2" size={20} />
