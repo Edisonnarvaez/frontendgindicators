@@ -369,7 +369,7 @@ const handleEdit = (result: Result) => {
                     <td className="px-4 py-2">{result.year}</td>
                     <td className="px-4 py-2">{result.numerator}</td>
                     <td className="px-4 py-2">{result.denominator}</td>
-                    <td className="px-4 py-2">{result.calculatedValue}</td>
+                    <td className="px-4 py-2">{result.calculatedValue.toFixed(2)}</td>
                     <td className="px-4 py-2">
                       <button
                         className="px-2 py-1 text-white bg-green-500 rounded-md mr-2"

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface MacroProcess {
   id: number;
@@ -27,6 +29,8 @@ const ProcessComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
 
   const [form, setForm] = useState<Partial<Process>>({
     name: '',
@@ -77,7 +81,7 @@ const ProcessComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      user: 1,
+      user: userId,
     };
 
     try {

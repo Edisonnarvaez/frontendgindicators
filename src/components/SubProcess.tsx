@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Layout from './Layout';
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface Process {
   id: number;
@@ -29,6 +30,8 @@ const SubProcessComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
 
   const [form, setForm] = useState<Partial<SubProcess>>({
     name: '',
@@ -87,7 +90,7 @@ const SubProcessComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      user: 1, // Usuario fijo, ajusta según sea necesario.
+      user: userId, // Usuario fijo, ajusta según sea necesario.
     };
 
     try {

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface Department {
   id: number;
@@ -25,6 +27,8 @@ const MacroProcessComponent: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // Estado para saber si estamos en edición
 
@@ -87,7 +91,7 @@ const MacroProcessComponent: React.FC = () => {
       ...form,
       status: form.status,
       department: form.department,
-      user: 1,
+      user: userId,
     };
 
     try {

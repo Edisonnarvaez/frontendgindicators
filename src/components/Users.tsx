@@ -135,8 +135,8 @@ const Users: React.FC = () => {
       role: form.role,
       //que el usuario se coloque automaticamente en el usuario que esta logueado
 
-      user: 1,
-      password: form.password || undefined, // Solo enviar si está presente
+      //user: 1,
+      //password: form.password || undefined, // Solo enviar si está presente
     };
     delete formData.lastLogin;
     console.log(formData);

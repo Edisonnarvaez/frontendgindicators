@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface SubProcess {
   id: number;
@@ -38,6 +40,8 @@ const IndicatorComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
 
   const [form, setForm] = useState<Partial<Indicator>>({
     name: '',
@@ -110,7 +114,7 @@ const IndicatorComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      user: 1, // Usuario fijo, ajusta según sea necesario.
+      user: userId, // Usuario fijo, ajusta según sea necesario.
     };
     //quiero imprimir lo que se estan enviando al backend
     console.log(formData);
@@ -236,7 +240,7 @@ const IndicatorComponent: React.FC = () => {
 
         {isModalOpen && (
           <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-4xl mx-auto my-4 sm:p-8">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-5xl mx-auto my-4 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Indicador</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
