@@ -3,6 +3,7 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEdit, FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa';
 
 interface MacroProcess {
   id: number;
@@ -109,6 +110,10 @@ const ProcessComponent: React.FC = () => {
     setForm(process);
     setIsEditing(true);
     setIsModalOpen(true);
+  };
+
+  const handleView = (process: Process) => {
+    alert(`Viewing process: ${process.name}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -298,18 +303,35 @@ const ProcessComponent: React.FC = () => {
                   <td className="px-6 py-4">{process.code}</td>
                   <td className="px-6 py-4">{process.version}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{process.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(process)}>
-                      Editar
-                    </button>
-                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(process.id)}>
-                      Eliminar
+
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
+                    <button
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEdit(process)}
+                      title="Editar"
+                    >
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${process.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
-                      onClick={() => handleToggleStatus(process.id, process.status)}
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(process)}
+                      title="Ver"
                     >
-                      {process.status ? 'Inactivar' : 'Activar'}
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDelete(process.id)}
+                      title="Eliminar"
+                    >
+                      <FaTrash size={20} />
+                    </button>
+                    <button
+                      className={process.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                      onClick={() => handleToggleStatus(process.id, process.status)}
+                      title={process.status ? 'Inactivar' : 'Activar'}
+                    >
+                      {process.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

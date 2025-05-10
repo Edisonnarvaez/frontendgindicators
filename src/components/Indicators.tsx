@@ -3,6 +3,7 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEdit, FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa';
 
 interface SubProcess {
   id: number;
@@ -169,6 +170,10 @@ const IndicatorComponent: React.FC = () => {
     setForm(indicator);
     setIsEditing(true);
     setIsModalOpen(true);
+  };
+
+  const handleView = (indicator: Indicator) => {
+    alert(`Viewing indicator: ${indicator.name}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -537,18 +542,35 @@ const IndicatorComponent: React.FC = () => {
                   <td className="px-6 py-4">{indicator.measurementUnit}</td>
                   <td className="px-6 py-4">{subProcesses.find(sp => sp.id === indicator.subProcess)?.name}</td>
                   <td className="px-6 py-4">{indicator.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(indicator)}>
-                      Editar
-                    </button>
-                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(indicator.id)}>
-                      Eliminar
+
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
+                    <button
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEdit(indicator)}
+                      title="Editar"
+                    >
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${indicator.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
-                      onClick={() => handleToggleStatus(indicator.id, indicator.status)}
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(indicator)}
+                      title="Ver"
                     >
-                      {indicator.status ? 'Inactivar' : 'Activar'}
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDelete(indicator.id)}
+                      title="Eliminar"
+                    >
+                      <FaTrash size={20} />
+                    </button>
+                    <button
+                      className={indicator.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                      onClick={() => handleToggleStatus(indicator.id, indicator.status)}
+                      title={indicator.status ? 'Inactivar' : 'Activar'}
+                    >
+                      {indicator.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

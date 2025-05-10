@@ -3,6 +3,8 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEdit } from 'react-icons/fa';
+import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 
 interface company {
     id: number;
@@ -116,6 +118,10 @@ const Headquarter: React.FC = () => {
         setForm(headquarter);
         setIsEditing(true);
         setIsModalOpen(true);
+    };
+
+    const handleView = (headquarter: Headquarter) => {
+        alert(`Viewing details for: ${headquarter.name}`);
     };
 
     const handleDelete = async (id: number) => {
@@ -349,18 +355,35 @@ const Headquarter: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.habilitationDate}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.closingDate}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.status ? 'Activo' : 'Inactivo'}</td>
-                                    <td className="px-6 py-4">
-                                        <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(headquarter)}>
-                                            Editar
-                                        </button>
-                                        <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(headquarter.id)}>
-                                            Eliminar
+
+                                    <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
+                                        <button
+                                            className="text-blue-600 hover:text-blue-800"
+                                            onClick={() => handleEdit(headquarter)}
+                                            title="Editar"
+                                        >
+                                            <FaEdit size={20} />
                                         </button>
                                         <button
-                                            className={`ml-4 ${headquarter.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
-                                            onClick={() => handleToggleStatus(headquarter.id, headquarter.status)}
+                                            className="text-green-600 hover:text-green-800"
+                                            onClick={() => handleView(headquarter)}
+                                            title="Ver"
                                         >
-                                            {headquarter.status ? 'Inactivar' : 'Activar'}
+                                            <FaEye size={20} />
+                                        </button>
+                                        <button
+                                            className="text-red-600 hover:text-red-800"
+                                            onClick={() => handleDelete(headquarter.id)}
+                                            title="Eliminar"
+                                        >
+                                            <FaTrash size={20} />
+                                        </button>
+                                        <button
+                                            className={headquarter.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                                            onClick={() => handleToggleStatus(headquarter.id, headquarter.status)}
+                                            title={headquarter.status ? 'Inactivar' : 'Activar'}
+                                        >
+                                            {headquarter.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                                         </button>
                                     </td>
                                 </tr>

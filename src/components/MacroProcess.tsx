@@ -3,6 +3,8 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
 
 interface Department {
   id: number;
@@ -130,6 +132,10 @@ const MacroProcessComponent: React.FC = () => {
     setForm(macroProcess);
     setIsEditing(true);
     setIsModalOpen(true);
+  };
+
+  const handleView = (macroProcess: MacroProcess) => {
+    alert(`Viewing MacroProcess: ${macroProcess.name}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -317,24 +323,35 @@ const MacroProcessComponent: React.FC = () => {
                     {departments.find(dept => dept.id === macroProcess.department)?.name || 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{macroProcess.code}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
                     <button
                       className="text-blue-600 hover:text-blue-800"
                       onClick={() => handleEdit(macroProcess)}
+                      title="Editar"
                     >
-                      Editar
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className="ml-4 text-red-600 hover:text-red-800"
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(macroProcess)}
+                      title="Ver"
+                    >
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
                       onClick={() => handleDelete(macroProcess.id)}
+                      title="Eliminar"
                     >
-                      Eliminar
+                      <FaTrash size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${macroProcess.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
+                      className={macroProcess.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
                       onClick={() => handleToggleStatus(macroProcess.id, macroProcess.status)}
+                      title={macroProcess.status ? 'Inactivar' : 'Activar'}
                     >
-                      {macroProcess.status ? 'Inactivar' : 'Activar'}
+                      {macroProcess.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

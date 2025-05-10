@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
+import { FaToggleOff, FaToggleOn } from 'react-icons/fa6';
+import { FaEdit, FaEye, FaTrash } from 'react-icons/fa';
 
 interface User {
   id: number;
@@ -240,6 +242,10 @@ const Users: React.FC = () => {
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
+  function handleView(user: User): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
 
     <Layout>
@@ -437,24 +443,34 @@ const Users: React.FC = () => {
                   <td className="px-6 py-4 text-sm text-gray-500">{user.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.role}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
                     <button
                       className="text-blue-600 hover:text-blue-800"
                       onClick={() => handleEdit(user)}
+                      title="Editar"
                     >
-                      Editar
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className="ml-4 text-red-600 hover:text-red-800"
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(user)}
+                      title="Ver"
+                    >
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
                       onClick={() => handleDelete(user.id)}
+                      title="Eliminar"
                     >
-                      Eliminar
+                      <FaTrash size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${user.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
+                      className={user.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
                       onClick={() => handleToggleStatus(user.id, user.status)}
+                      title={user.status ? 'Inactivar' : 'Activar'}
                     >
-                      {user.status ? 'Inactivar' : 'Activar'}
+                      {user.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

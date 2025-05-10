@@ -3,6 +3,8 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
 
 interface Process {
   id: number;
@@ -130,6 +132,10 @@ const SubProcessComponent: React.FC = () => {
     setForm(subProcess);
     setIsEditing(true);
     setIsModalOpen(true);
+  };
+
+  const handleView = (subProcess: SubProcess) => {
+    alert(`Viewing SubProcess: ${subProcess.name}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -328,18 +334,35 @@ const SubProcessComponent: React.FC = () => {
                   <td className="px-6 py-4">{subProcess.version}</td>
                   <td className="px-6 py-4">{processes.find(p => p.id === subProcess.process)?.name}</td>
                   <td className="px-6 py-4">{subProcess.status ? 'Activo' : 'Inactivo'}</td>
-                  <td className="px-6 py-4">
-                    <button className="text-blue-600 hover:text-blue-800" onClick={() => handleEdit(subProcess)}>
-                      Editar
-                    </button>
-                    <button className="ml-4 text-red-600 hover:text-red-800" onClick={() => handleDelete(subProcess.id)}>
-                      Eliminar
+
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
+                    <button
+                      className="text-blue-600 hover:text-blue-800"
+                      onClick={() => handleEdit(subProcess)}
+                      title="Editar"
+                    >
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${subProcess.status ? 'text-yellow-600' : 'text-green-600'} hover:text-yellow-800`}
-                      onClick={() => handleToggleStatus(subProcess.id, subProcess.status)}
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(subProcess)}
+                      title="Ver"
                     >
-                      {subProcess.status ? 'Inactivar' : 'Activar'}
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDelete(subProcess.id)}
+                      title="Eliminar"
+                    >
+                      <FaTrash size={20} />
+                    </button>
+                    <button
+                      className={subProcess.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                      onClick={() => handleToggleStatus(subProcess.id, subProcess.status)}
+                      title={subProcess.status ? 'Inactivar' : 'Activar'}
+                    >
+                      {subProcess.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

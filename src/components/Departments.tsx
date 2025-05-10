@@ -3,6 +3,8 @@ import Layout from './Layout';
 import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
 
 interface company {
   id: number;
@@ -115,6 +117,10 @@ const Departments: React.FC = () => {
     setForm(department);
     setIsEditing(true);
     setIsModalOpen(true);
+  };
+
+  const handleView = (department: Department) => {
+    alert(`Viewing department: ${department.name}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -295,27 +301,35 @@ const Departments: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     {department.status ? 'Activo' : 'Inactivo'}
                   </td>
-                  <td className="px-6 py-4">
+
+                  <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
                     <button
                       className="text-blue-600 hover:text-blue-800"
                       onClick={() => handleEdit(department)}
+                      title="Editar"
                     >
-                      Editar
+                      <FaEdit size={20} />
                     </button>
                     <button
-                      className="ml-4 text-red-600 hover:text-red-800"
+                      className="text-green-600 hover:text-green-800"
+                      onClick={() => handleView(department)}
+                      title="Ver"
+                    >
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
                       onClick={() => handleDelete(department.id)}
+                      title="Eliminar"
                     >
-                      Eliminar
+                      <FaTrash size={20} />
                     </button>
                     <button
-                      className={`ml-4 ${department.status ? 'text-yellow-600' : 'text-green-600'
-                        } hover:text-yellow-800`}
-                      onClick={() =>
-                        handleToggleStatus(department.id, department.status)
-                      }
+                      className={department.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                      onClick={() => handleToggleStatus(department.id, department.status)}
+                      title={department.status ? 'Inactivar' : 'Activar'}
                     >
-                      {department.status ? 'Inactivar' : 'Activar'}
+                      {department.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>
