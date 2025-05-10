@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 interface company {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
 interface Department {
@@ -181,91 +181,89 @@ const Departments: React.FC = () => {
         </button>
 
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Area</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="habilitationCode" className="block text-sm font-medium">Nombre del Area</label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="nombre"
-                    value={form.name || ''}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
+          <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto my-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Area</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-1">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre del Área</label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Nombre"
+                      value={form.name || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="departmentCode" className="block text-sm font-medium text-gray-700">Código de Área</label>
+                    <input
+                      type="text"
+                      name="departmentCode"
+                      placeholder="Código de área"
+                      value={form.departmentCode || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">Empresa</label>
+                    <select
+                      name="company"
+                      value={form.company || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    >
+                      <option value="">Seleccione Empresa</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.id}>
+                          {company.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descripción</label>
+                    <input
+                      type="text"
+                      name="description"
+                      placeholder="Descripción"
+                      value={form.description || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado</label>
+                    <select
+                      name="status"
+                      value={form.status ? 'true' : 'false'}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    >
+                      <option value="true">Activo</option>
+                      <option value="false">Inactivo</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label htmlFor="departmentCode" className="block text-sm font-medium">Codigo de Area</label>
-                  <input
-                    type="text"
-                    name="departmentCode"
-                    placeholder="Codigo de area"
-                    value={form.departmentCode || ''}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
-                  <select
-                    name="company"
-                    value={form.company || ''}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  >
-                    <option value="">Seleccione Empresa</option>
-                    {companies.map((company) => (
-                      <option key={company.id} value={company.id}>
-                        {company.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium">Descripcion</label>
-                  <input
-                    type="text"
-                    name="description"
-                    placeholder="Descripcion"
-                    value={form.description || ''}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium">Estado</label>
-
-
-                  <select
-                    name="status"
-                    value={form.status ? 'true' : 'false'}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  >
-                    <option value="true">Activo</option>
-                    <option value="false">Inactivo</option>
-                  </select>
-
-                </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-center sm:justify-end space-x-4 mt-8">
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-300 rounded-md"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
                     onClick={() => setIsModalOpen(false)}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     {isEditing ? 'Actualizar' : 'Guardar'}
                   </button>

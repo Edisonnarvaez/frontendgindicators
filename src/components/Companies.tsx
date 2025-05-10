@@ -35,7 +35,7 @@ const Companies: React.FC = () => {
     contactEmail: '',
     foundationDate: '',
     status: true,
-    
+
   });
 
   useEffect(() => {
@@ -165,126 +165,126 @@ const Companies: React.FC = () => {
         </button>
 
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Empresa</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Nombre de la empresa</label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder='Nombre de la empresa'
-                  value={form.name || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
+          <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto my-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Empresa</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre de la empresa</label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Nombre de la empresa"
+                      value={form.name || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 blockfaq w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="nit" className="block text-sm font-medium text-gray-700">NIT de la empresa</label>
+                    <input
+                      type="text"
+                      name="nit"
+                      placeholder="NIT de la empresa"
+                      value={form.nit || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="legalRepresentative" className="block text-sm font-medium text-gray-700">Representante legal</label>
+                    <input
+                      type="text"
+                      name="legalRepresentative"
+                      placeholder="Representante legal"
+                      value={form.legalRepresentative || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono de la empresa</label>
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Teléfono de la empresa"
+                      value={form.phone || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">Dirección de la empresa</label>
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Dirección de la empresa"
+                      value={form.address || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700">Correo electrónico del representante legal</label>
+                    <input
+                      type="email"
+                      name="contactEmail"
+                      placeholder="Correo electrónico del representante legal"
+                      value={form.contactEmail || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="foundationDate" className="block text-sm font-medium text-gray-700">Fecha de fundación de la empresa</label>
+                    <input
+                      type="date"
+                      name="foundationDate"
+                      placeholder="Fecha de fundación de la empresa"
+                      value={form.foundationDate || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado</label>
+                    <select
+                      name="status"
+                      value={form.status ? 'true' : 'false'}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="true">Activo</option>
+                      <option value="false">Inactivo</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">NIT de la empresa</label>
-                <input
-                  type="text"
-                  name="nit"
-                  placeholder='NIT de la empresa'
-                  value={form.nit || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Representante legal</label>
-                <input
-                  type="text"
-                  name="legalRepresentative"
-                  placeholder='Representante legal'
-                  value={form.legalRepresentative || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Telefono de la empresa</label>
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder='Telefono de la empresa'
-                  value={form.phone || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-
-                />
-                </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Direccion de la empresa</label>
-                <input
-                  type="text"
-                  name="address"
-                  placeholder='Direccion de la empresa'
-                  value={form.address || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Correo electronico del representante legal</label>
-                <input
-                  type="email"
-                  name="contactEmail"
-                  placeholder='Correo electronico del representante legal'
-                  value={form.contactEmail || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-                </div>
-                <div>
-                <label htmlFor="habilitationCode" className="block text-sm font-medium">Fecha de fundacion de la empresa</label>
-                <input
-                  type="date"
-                  name="foundationDate"
-                  placeholder='Fecha de fundacion de la empresa'
-                  value={form.foundationDate || ''}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-
-                />
-                </div>
-                <div>
-                <label htmlFor="status" className="block text-sm font-medium">Estado</label>              
-                <select
-                  name="status"
-                  value={form.status ? 'true' : 'false'}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="true">Activo</option>
-                  <option value="false">Inactivo</option>
-                </select>
-                </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-center sm:justify-end space-x-4 mt-8">
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-300 rounded-md"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
                     onClick={() => setIsModalOpen(false)}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     {isEditing ? 'Actualizar' : 'Guardar'}
                   </button>
                 </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
         )}
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">

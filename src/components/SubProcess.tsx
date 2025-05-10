@@ -78,7 +78,7 @@ const SubProcessComponent: React.FC = () => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: value === 'true', 
+      [name]: value === 'true',
     }));
   };
 
@@ -186,78 +186,78 @@ const SubProcessComponent: React.FC = () => {
         </button>
 
         {isModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
-                <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} SubProceso</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto my-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} SubProceso</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-1">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium">Nombre</label>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre</label>
                     <input
                       type="text"
                       name="name"
-                      placeholder='Nombre del SubProceso'
+                      placeholder="Nombre del SubProceso"
                       value={form.name || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="description" className="block text-sm font-medium">Descripción</label>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descripción</label>
                     <input
                       type="text"
                       name="description"
-                      placeholder='Descripción del SubProceso'
+                      placeholder="Descripción del SubProceso"
                       value={form.description || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="code" className="block text-sm font-medium">Código</label>
+                    <label htmlFor="code" className="block text-sm font-medium text-gray-700">Código</label>
                     <input
                       type="text"
                       name="code"
-                      placeholder='Código del SubProceso'
+                      placeholder="Código del SubProceso"
                       value={form.code || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="version" className="block text-sm font-medium">Versión</label>
+                    <label htmlFor="version" className="block text-sm font-medium text-gray-700">Versión</label>
                     <input
                       type="text"
                       name="version"
-                      placeholder='Versión del SubProceso'
+                      placeholder="Versión del SubProceso"
                       value={form.version || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="code" className="block text-sm font-medium">Autor</label>
+                    <label htmlFor="author" className="block text-sm font-medium text-gray-700">Autor</label>
                     <input
                       type="text"
                       name="author"
-                      placeholder='Autor del SubProceso'
+                      placeholder="Autor del SubProceso"
                       value={form.author || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="process" className="block text-sm font-medium">Proceso</label>
+                    <label htmlFor="process" className="block text-sm font-medium text-gray-700">Proceso</label>
                     <select
                       name="process"
                       value={form.process || 0}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     >
                       <option value={0} disabled>Seleccionar proceso</option>
@@ -269,34 +269,34 @@ const SubProcessComponent: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium">Estado</label>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado</label>
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
                       onChange={handleSelectChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="true">Activo</option>
                       <option value="false">Inactivo</option>
                     </select>
                   </div>
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-gray-300 rounded-md"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                    >
-                      {isEditing ? 'Actualizar' : 'Guardar'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div className="flex justify-center sm:justify-end space-x-4 mt-8">
+                  <button
+                    type="button"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    {isEditing ? 'Actualizar' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -314,7 +314,7 @@ const SubProcessComponent: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
-            </thead>            
+            </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {subProcesses.map((subProcess) => (
                 <tr key={subProcess.id}>

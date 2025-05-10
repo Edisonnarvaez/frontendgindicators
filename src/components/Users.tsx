@@ -120,7 +120,7 @@ const Users: React.FC = () => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: value === 'true', 
+      [name]: value === 'true',
     }));
   };
 
@@ -129,13 +129,13 @@ const Users: React.FC = () => {
 
     const formData = {
       ...form,
-      status: form.status, 
-      department: form.department, 
+      status: form.status,
+      department: form.department,
       company: form.company,
       role: form.role,
       //que el usuario se coloque automaticamente en el usuario que esta logueado
 
-      user: 1, 
+      user: 1,
       password: form.password || undefined, // Solo enviar si está presente
     };
     delete formData.lastLogin;
@@ -171,17 +171,17 @@ const Users: React.FC = () => {
       });
       setIsEditing(false);
     } //catch (error) {
-      //console.error('Error al guardar los datos', error);
-      //alert('Error al crear o actualizar el usuario');
-      catch (error: any) {
-        if (error.response && error.response.data) {
-          console.error('Errores del backend:', error.response.data);
-          alert(`Error: ${JSON.stringify(error.response.data)}`);
-        } else {
-          console.error('Error inesperado:', error);
-          alert('Error inesperado al crear o actualizar el usuario');
-        }
+    //console.error('Error al guardar los datos', error);
+    //alert('Error al crear o actualizar el usuario');
+    catch (error: any) {
+      if (error.response && error.response.data) {
+        console.error('Errores del backend:', error.response.data);
+        alert(`Error: ${JSON.stringify(error.response.data)}`);
+      } else {
+        console.error('Error inesperado:', error);
+        alert('Error inesperado al crear o actualizar el usuario');
       }
+    }
     //}
   };
 
@@ -245,8 +245,8 @@ const Users: React.FC = () => {
     <Layout>
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Usuarios</h1>
-      
-      {/* Botón para abrir el modal para agregar un nuevo macroproceso */}
+
+        {/* Botón para abrir el modal para agregar un nuevo macroproceso */}
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
           onClick={handleOpenModal}  // Usamos la función `handleOpenModal`
@@ -256,92 +256,90 @@ const Users: React.FC = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md mx-auto">
-                <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Usuario</h2>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-auto my-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Usuario</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium">Nombre</label>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Nombre</label>
                     <input
                       type="text"
                       name="firstName"
-                      placeholder='Nombres'
+                      placeholder="Nombres"
                       value={form.firstName || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium">Apellidos</label>
-                    <input 
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Apellidos</label>
+                    <input
                       type="text"
                       name="lastName"
-                      placeholder='Apellidos'
+                      placeholder="Apellidos"
                       value={form.lastName || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="username" className="block text-sm font-medium">Usuario</label>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">Usuario</label>
                     <input
                       type="text"
                       name="username"
-                      placeholder='Usuario'
+                      placeholder="Usuario"
                       value={form.username || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium">Contraseña</label>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
                     <input
-                        type="password"
-                        name="password"
-                        placeholder='Contraseña'
-                        value={form.password || ''}
-                        onChange={handleChange}
-                        className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
-                        required={!isEditing} // Requerido solo en creación
+                      type="password"
+                      name="password"
+                      placeholder="Contraseña"
+                      value={form.password || ''}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required={!isEditing}
                     />
-                </div>
+                  </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium">Correo electrónico</label>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo electrónico</label>
                     <input
                       type="email"
                       name="email"
-                      placeholder='Correo electrónico'
+                      placeholder="Correo electrónico"
                       value={form.email || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium">Teléfono</label>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono</label>
                     <input
                       type="text"
                       name="phone"
-                      placeholder='Teléfono'
+                      placeholder="Teléfono"
                       value={form.phone || ''}
                       onChange={handleChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
                   </div>
-                  
                   <div>
-                    <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
+                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">Empresa</label>
                     <select
                       name="company"
-                      value={form.company || 0}  
-                      onChange={handleChange}  
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      value={form.company || 0}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value={0} disabled>Seleccionar empresa</option>
                       {companies.map(company => (
@@ -351,14 +349,13 @@ const Users: React.FC = () => {
                       ))}
                     </select>
                   </div>
-
                   <div>
-                    <label htmlFor="department" className="block text-sm font-medium">Area</label>
+                    <label htmlFor="department" className="block text-sm font-medium text-gray-700">Area</label>
                     <select
                       name="department"
-                      value={form.department || 0}  
-                      onChange={handleChange}  
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      value={form.department || 0}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value={0} disabled>Seleccionar area</option>
                       {departments.map(dept => (
@@ -369,12 +366,12 @@ const Users: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="role" className="block text-sm font-medium">Rol</label>
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700">Rol</label>
                     <select
                       name="role"
-                      value={form.role || 0}  
-                      onChange={handleChange}  
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      value={form.role || 0}
+                      onChange={handleChange}
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value={0} disabled>Seleccionar rol</option>
                       {roles.map(role => (
@@ -384,37 +381,35 @@ const Users: React.FC = () => {
                       ))}
                     </select>
                   </div>
-                  
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium">Estado</label>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado</label>
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
                       onChange={handleSelectChange}
-                      className="mt-1 p-2 block w-full shadow-sm border border-gray-300 rounded-md"
+                      className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="true">Activo</option>
                       <option value="false">Inactivo</option>
                     </select>
                   </div>
-
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-gray-300 rounded-md"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                    >
-                      {isEditing ? 'Actualizar' : 'Guardar'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div className="flex justify-center sm:justify-end space-x-4 mt-8">
+                  <button
+                    type="button"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    {isEditing ? 'Actualizar' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

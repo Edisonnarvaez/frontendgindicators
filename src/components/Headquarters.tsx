@@ -183,137 +183,136 @@ const Headquarter: React.FC = () => {
                 </button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                            <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Editar' : 'Agregar'} Sede</h2>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label htmlFor="name" className="block text-sm font-medium">Nombre</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        placeholder='Nombre de la sede'
-                                        value={form.name || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    />
+                    <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto my-4 sm:p-8">
+                            <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Sede</h2>
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+                                    <div>
+                                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            placeholder="Nombre de la sede"
+                                            value={form.name || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="habilitationCode" className="block text-sm font-medium text-gray-700">Código de habilitación</label>
+                                        <input
+                                            type="text"
+                                            name="habilitationCode"
+                                            placeholder="Código de habilitación de la sede"
+                                            value={form.habilitationCode || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="company" className="block text-sm font-medium text-gray-700">Empresa</label>
+                                        <select
+                                            name="company"
+                                            value={form.company || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        >
+                                            <option value="">Seleccione Empresa</option>
+                                            {companies.map((company) => (
+                                                <option key={company.id} value={company.id}>
+                                                    {company.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="departament" className="block text-sm font-medium text-gray-700">Departamento</label>
+                                        <input
+                                            type="text"
+                                            name="departament"
+                                            placeholder="Departamento de la sede"
+                                            value={form.departament || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ciudad</label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            placeholder="Ciudad de la sede"
+                                            value={form.city || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Dirección</label>
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            placeholder="Dirección de la sede"
+                                            value={form.address || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="habilitationDate" className="block text-sm font-medium text-gray-700">Fecha de habilitación</label>
+                                        <input
+                                            type="date"
+                                            name="habilitationDate"
+                                            placeholder="Fecha de habilitación de la sede"
+                                            value={form.habilitationDate || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="closingDate" className="block text-sm font-medium text-gray-700">Fecha de cierre</label>
+                                        <input
+                                            type="date"
+                                            name="closingDate"
+                                            placeholder="Fecha de cierre de la sede"
+                                            value={form.closingDate || ''}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Estado</label>
+                                        <select
+                                            name="status"
+                                            value={form.status ? 'true' : 'false'}
+                                            onChange={handleChange}
+                                            className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                            <option value="true">Activo</option>
+                                            <option value="false">Inactivo</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="habilitationCode" className="block text-sm font-medium">Codigo de habilitacion</label>
-                                    <input
-                                        type="text"
-                                        name="habilitationCode"
-                                        placeholder='codigo de habilitationCode de la sede'
-                                        value={form.habilitationCode || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
-                                    <select
-                                        name="company"
-                                        value={form.company || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    >
-                                        <option value="">Seleccione Empresa</option>
-                                        {companies.map((company) => (
-                                            <option key={company.id} value={company.id}>
-                                                {company.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="departament" className="block text-sm font-medium">Departamento</label>
-                                    <input
-                                        type="text"
-                                        name="departament"
-                                        placeholder='Departamento de la sede'
-                                        value={form.departament || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="city" className="block text-sm font-medium">Ciudad</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder='ciudad de la sede'
-                                        value={form.city || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="address" className="block text-sm font-medium">Direccion</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        placeholder='Direccion de la sede'
-                                        value={form.address || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="habilitationDate" className="block text-sm font-medium">Fecha de habilitacion</label>
-                                    <input
-                                        type="date"
-                                        name="habilitationDate"
-                                        placeholder='Fecha de habilitacion de la sede'
-                                        value={form.habilitationDate || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="closingDate" className="block text-sm font-medium">Fecha de cierre</label>
-                                    <input
-                                        type="date"
-                                        name="closingDate"
-                                        placeholder='Fecha de cierre de la sede'
-                                        value={form.closingDate || ''}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                        required
-
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="status" className="block text-sm font-medium">Estado</label>
-                                    <select
-                                        name="status"
-                                        value={form.status ? 'true' : 'false'}
-                                        onChange={handleChange}
-                                        className="w-full p-2 border rounded"
-                                    >
-                                        <option value="true">Activo</option>
-                                        <option value="false">Inactivo</option>
-                                    </select>
-                                </div>
-                                <div className="flex justify-end space-x-2">
+                                <div className="flex justify-center sm:justify-end space-x-4 mt-8">
                                     <button
                                         type="button"
-                                        className="px-4 py-2 bg-gray-300 rounded-md"
+                                        className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
                                         onClick={() => setIsModalOpen(false)}
                                     >
                                         Cancelar
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                                        className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                     >
                                         {isEditing ? 'Actualizar' : 'Guardar'}
                                     </button>
@@ -322,7 +321,6 @@ const Headquarter: React.FC = () => {
                         </div>
                     </div>
                 )}
-
                 <div className="bg-white shadow-md rounded-lg overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
