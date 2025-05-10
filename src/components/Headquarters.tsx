@@ -4,11 +4,16 @@ import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
+interface company {
+    id: number;
+    name: string;
+}
+
 interface Headquarter {
     id: number;
     name: string;
     habilitationCode: string;
-    company: string;
+    company: number;
     departament: string;
     city: string;
     address: string;
@@ -20,17 +25,17 @@ interface Headquarter {
 
 const Headquarter: React.FC = () => {
     const [headquarters, setHeadquarters] = useState<Headquarter[]>([]);
+    const [companies, setCompanies] = useState<company[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.user) as { id: number } | null;
     const userId = user ? user.id : null;
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [form, setForm] = useState<Partial<Headquarter>>({
         name: '',
         habilitationCode: '',
-        company: '',
+        company: 0,
         departament: '',
         city: '',
         address: '',
@@ -53,9 +58,19 @@ const Headquarter: React.FC = () => {
                 setLoading(false);
             }
         };
+        const fetchCompanies = async () => {
+            try {
+                const response = await api.get('/companies/');
+                setCompanies(response.data);
+            } catch (err) {
+                console.error(err);
+                setError('Failed to fetch Companies');
+            }
+        };
 
 
         fetchHeadquarters();
+        fetchCompanies();
         //fetchMacroProcesses();
     }, []);
 
@@ -136,7 +151,7 @@ const Headquarter: React.FC = () => {
         setForm({
             name: '',
             habilitationCode: '',
-            company: '',
+            company: 0,
             departament: '',
             city: '',
             address: '',
@@ -185,103 +200,108 @@ const Headquarter: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                <label htmlFor="habilitationCode" className="block text-sm font-medium">Codigo de habilitacion</label>
-                                <input
-                                    type="text"
-                                    name="habilitationCode"
-                                    placeholder='codigo de habilitationCode de la sede'
-                                    value={form.habilitationCode || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
+                                    <label htmlFor="habilitationCode" className="block text-sm font-medium">Codigo de habilitacion</label>
+                                    <input
+                                        type="text"
+                                        name="habilitationCode"
+                                        placeholder='codigo de habilitationCode de la sede'
+                                        value={form.habilitationCode || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
-                                <input
-                                    type="text"
-                                    name="company"
-                                    placeholder='Empresa de la sede'
-                                    value={form.company || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
+                                    <label htmlFor="company" className="block text-sm font-medium">Empresa</label>
+                                    <select
+                                        name="company"
+                                        value={form.company || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    >
+                                        <option value="">Seleccione Empresa</option>
+                                        {companies.map((company) => (
+                                            <option key={company.id} value={company.id}>
+                                                {company.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div>
-                                <label htmlFor="departament" className="block text-sm font-medium">Departamento</label>
-                                <input
-                                    type="text"
-                                    name="departament"
-                                    placeholder='Departamento de la sede'
-                                    value={form.departament || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
+                                    <label htmlFor="departament" className="block text-sm font-medium">Departamento</label>
+                                    <input
+                                        type="text"
+                                        name="departament"
+                                        placeholder='Departamento de la sede'
+                                        value={form.departament || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="city" className="block text-sm font-medium">Ciudad</label>
-                                <input
-                                    type="text"
-                                    name="city"
-                                    placeholder='ciudad de la sede'
-                                    value={form.city || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
+                                    <label htmlFor="city" className="block text-sm font-medium">Ciudad</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder='ciudad de la sede'
+                                        value={form.city || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
 
-                                />
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="address" className="block text-sm font-medium">Direccion</label>
-                                <input
-                                    type="text"
-                                    name="address"
-                                    placeholder='Direccion de la sede'
-                                    value={form.address || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
+                                    <label htmlFor="address" className="block text-sm font-medium">Direccion</label>
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        placeholder='Direccion de la sede'
+                                        value={form.address || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="habilitationDate" className="block text-sm font-medium">Fecha de habilitacion</label>
-                                <input
-                                    type="date"
-                                    name="habilitationDate"
-                                    placeholder='Fecha de habilitacion de la sede'
-                                    value={form.habilitationDate || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
+                                    <label htmlFor="habilitationDate" className="block text-sm font-medium">Fecha de habilitacion</label>
+                                    <input
+                                        type="date"
+                                        name="habilitationDate"
+                                        placeholder='Fecha de habilitacion de la sede'
+                                        value={form.habilitationDate || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="closingDate" className="block text-sm font-medium">Fecha de cierre</label>
-                                <input
-                                    type="date"
-                                    name="closingDate"
-                                    placeholder='Fecha de cierre de la sede'
-                                    value={form.closingDate || ''}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                    required
+                                    <label htmlFor="closingDate" className="block text-sm font-medium">Fecha de cierre</label>
+                                    <input
+                                        type="date"
+                                        name="closingDate"
+                                        placeholder='Fecha de cierre de la sede'
+                                        value={form.closingDate || ''}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                        required
 
-                                />
+                                    />
                                 </div>
                                 <div>
-                                <label htmlFor="status" className="block text-sm font-medium">Estado</label>
-                                <select
-                                    name="status"
-                                    value={form.status ? 'true' : 'false'}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded"
-                                >
-                                    <option value="true">Activo</option>
-                                    <option value="false">Inactivo</option>
-                                </select>
+                                    <label htmlFor="status" className="block text-sm font-medium">Estado</label>
+                                    <select
+                                        name="status"
+                                        value={form.status ? 'true' : 'false'}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded"
+                                    >
+                                        <option value="true">Activo</option>
+                                        <option value="false">Inactivo</option>
+                                    </select>
                                 </div>
                                 <div className="flex justify-end space-x-2">
                                     <button
@@ -310,7 +330,6 @@ const Headquarter: React.FC = () => {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre de la sede</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codigo de habilitacion</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciudad</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direccion</th>
@@ -326,7 +345,6 @@ const Headquarter: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.id}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.habilitationCode}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{headquarter.company}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.departament}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.city}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{headquarter.address}</td>

@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
+
+interface company {
+    id: number;
+    name: string;
+}
 
 interface Department {
   id: number;
   name: string;
   departmentCode: string;
-  company: string;
+  company: number;
   description: string;
   //creationDate: Date;  // Cambiado a string
   status: boolean;
@@ -14,16 +21,18 @@ interface Department {
 
 const Departments: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [companies, setCompanies] = useState<company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [companies, setCompanies] = useState<any[]>([]);
+  const user = useSelector((state: RootState) => state.user) as { id: number } | null;
+  const userId = user ? user.id : null;
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [form, setForm] = useState<Partial<Department>>({
     name: '',
     departmentCode: '',
-    company: '',
+    company: 0,
     description: '',
     //creationDate: new Date(),  // Cambiado a Date
     //creationDate: '',
@@ -72,12 +81,14 @@ const Departments: React.FC = () => {
 
     const formData = {
       ...form,
-      user: 1,
+      user: userId,
+      //user: 1,
       //creationDate: form.creationDate instanceof Date
       //  ? form.creationDate.toISOString().split('T')[0]
       //  : form.creationDate,
       //creationDate: form.creationDate ? form.creationDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0], // Cambiado a ISO String
     };
+    console.log(formData);
 
     try {
       if (isEditing) {
@@ -139,7 +150,7 @@ const Departments: React.FC = () => {
     setForm({
       name: '',
       departmentCode: '',
-      company: '',
+      company: 0,
       description: '',
       //creationDate: new Date(),  // Cambiado a Date
       //creationDate: ,
