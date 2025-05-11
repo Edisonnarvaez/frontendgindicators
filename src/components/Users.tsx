@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Layout from './Layout';
 import api from '../api';
-import { FaToggleOff, FaToggleOn } from 'react-icons/fa6';
-import { FaEdit, FaEye, FaTrash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import { FaTrash, FaEdit, FaToggleOn, FaToggleOff, FaEye } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; // Ajusta la ruta
+import ConfirmationModal from './ConfirmationModal';
 
 interface User {
   id: number;
@@ -37,6 +39,7 @@ interface Role {
 }
 
 const Users: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -44,7 +47,11 @@ const Users: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Estado para saber si estamos en edición
+  const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState<number | null>(null);
+  const [userIdToToggle, setUserIdToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
+
 
   const [form, setForm] = useState<Partial<User>>({
     firstName: '',
@@ -58,7 +65,6 @@ const Users: React.FC = () => {
     status: true,
     lastLogin: '',
     password: '',
-
   });
 
   useEffect(() => {
@@ -67,9 +73,10 @@ const Users: React.FC = () => {
         const response = await api.get('/users/');
         setUsers(response.data);
         setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch users');
+      } catch (err: any) {
+        console.error('Error fetching users:', err);
+        setError('No se pudieron cargar los usuarios');
+        notifyError('No se pudieron cargar los usuarios');
         setLoading(false);
       }
     };
@@ -78,9 +85,10 @@ const Users: React.FC = () => {
       try {
         const response = await api.get('/departments/');
         setDepartments(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Departments');
+      } catch (err: any) {
+        console.error('Error fetching departments:', err);
+        setError('No se pudieron cargar los departamentos');
+        notifyError('No se pudieron cargar los departamentos');
       }
     };
 
@@ -88,9 +96,10 @@ const Users: React.FC = () => {
       try {
         const response = await api.get('/companies/');
         setCompanies(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Companies');
+      } catch (err: any) {
+        console.error('Error fetching companies:', err);
+        setError('No se pudieron cargar las empresas');
+        notifyError('No se pudieron cargar las empresas');
       }
     };
 
@@ -98,9 +107,10 @@ const Users: React.FC = () => {
       try {
         const response = await api.get('/roles/');
         setRoles(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Roles');
+      } catch (err: any) {
+        console.error('Error fetching roles:', err);
+        setError('No se pudieron cargar los roles');
+        notifyError('No se pudieron cargar los roles');
       }
     };
 
@@ -135,26 +145,20 @@ const Users: React.FC = () => {
       department: form.department,
       company: form.company,
       role: form.role,
-      //que el usuario se coloque automaticamente en el usuario que esta logueado
-
-      //user: 1,
-      //password: form.password || undefined, // Solo enviar si está presente
     };
     delete formData.lastLogin;
-    console.log(formData);
 
     try {
-      //let response;
       if (isEditing) {
         const response = await api.put(`/users/${form.id}/`, formData);
-        alert('Usuario actualizado exitosamente');
         setUsers((prev) =>
-          prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
+          prev.map((user) => (user.id === response.data.id ? response.data : user))
         );
+        notifySuccess('Usuario actualizado exitosamente');
       } else {
         const response = await api.post(`/users/`, formData);
-        alert('Usuario creado exitosamente');
         setUsers((prev) => [...prev, response.data]);
+        notifySuccess('Usuario creado exitosamente');
       }
 
       setIsModalOpen(false);
@@ -168,23 +172,17 @@ const Users: React.FC = () => {
         department: 0,
         role: 0,
         status: true,
-        //lastLogin: '',
+        lastLogin: '',
         password: '',
       });
       setIsEditing(false);
-    } //catch (error) {
-    //console.error('Error al guardar los datos', error);
-    //alert('Error al crear o actualizar el usuario');
-    catch (error: any) {
-      if (error.response && error.response.data) {
-        console.error('Errores del backend:', error.response.data);
-        alert(`Error: ${JSON.stringify(error.response.data)}`);
-      } else {
-        console.error('Error inesperado:', error);
-        alert('Error inesperado al crear o actualizar el usuario');
-      }
+    } catch (error: any) {
+      console.error('Error al guardar los datos:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        (error.response?.data ? JSON.stringify(error.response.data) : 'Error al crear o actualizar el usuario');
+      notifyError(errorMessage);
     }
-    //}
   };
 
   const handleEdit = (user: User) => {
@@ -193,37 +191,65 @@ const Users: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar este usuario?')) return;
+  const handleDelete = (id: number) => {
+    setUserIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!userIdToDelete) return;
 
     try {
-      await api.delete(`/users/${id}/`);
-      setUsers((prev) => prev.filter((user) => user.id !== id));
-      alert('Usuario eliminado exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar el usuario', error);
-      alert('Error al eliminar el usuario');
+      await api.delete(`/users/${userIdToDelete}/`);
+      setUsers((prev) => prev.filter((user) => user.id !== userIdToDelete));
+      notifySuccess('Usuario eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el usuario:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el usuario';
+      notifyError(errorMessage);
+    } finally {
+      setUserIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setUserIdToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!userIdToToggle) return;
+
     try {
-      const response = await api.patch(`/users/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/users/${userIdToToggle.id}/`, {
+        status: !userIdToToggle.currentStatus,
       });
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id === id ? { ...user, status: response.data.status } : user
+          user.id === userIdToToggle.id ? { ...user, status: response.data.status } : user
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
+      notifySuccess(`Usuario ${userIdToToggle.currentStatus ? 'inactivado' : 'activado'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del usuario';
+      notifyError(errorMessage);
+    } finally {
+      setUserIdToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  // Abrir modal para agregar usuario (limpio, sin datos)
+  const handleView = (user: User) => {
+   // setSelectedUser(user);
+    //setIsViewModalOpen(true);
+  };
+
   const handleOpenModal = () => {
-    setIsEditing(false);  // Establecer isEditing en false para asegurar que estamos en modo de creación
+    setIsEditing(false);
     setForm({
       firstName: '',
       lastName: '',
@@ -235,17 +261,15 @@ const Users: React.FC = () => {
       role: 0,
       status: true,
       lastLogin: '',
-    });  // Limpiar el formulario
+      password: '',
+    });
     setIsModalOpen(true);
   };
 
+  
+
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
-
-  function handleView(user: User): void {
-    throw new Error('Function not implemented.');
-  }
-
   return (
 
     <Layout>
@@ -476,10 +500,34 @@ const Users: React.FC = () => {
                 </tr>
               ))}
             </tbody>
+            
           </table>
         </div>
+        
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setUserIdToDelete(null);
+            setUserIdToToggle(null);
+          }}
+          onConfirm={() => {
+            if (userIdToDelete) confirmDelete();
+            if (userIdToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            userIdToDelete
+              ? '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.'
+              : userIdToToggle
+              ? `¿Estás seguro de que deseas ${userIdToToggle.currentStatus ? 'inactivar' : 'activar'} este usuario?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
+    
     </Layout>
+    
   );
 };
 
