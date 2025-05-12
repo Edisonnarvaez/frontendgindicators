@@ -5,6 +5,16 @@ import { setTokens } from '../store/slices/authSlice';
 import axios from 'axios';
 import { Lock } from 'lucide-react';
 
+//
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import api from '../api';
+import { setUser } from '../store/userSlice';
+import { rolePermissions } from '../types/rbac';
+
+//**** */
+
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -14,7 +24,15 @@ const Login: React.FC = () => {
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+//****** */
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [twoFACode, setTwoFACode] = useState('');
+  const [show2FA, setShow2FA] = useState(false);
+  const [tempUser, setTempUser] = useState<any>(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+//**** */
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,6 +102,70 @@ const Login: React.FC = () => {
       setError('No se recibió el token de la API');
     }
   };
+
+  //***** */
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/login', { username, password });
+      const userData = response.data;
+
+      if (userData.twoFARequired) {
+        setTempUser(userData);
+        setShow2FA(true);
+      } else {
+        // Mapear el rol de la API
+        const roleName = userData.roleName?.toLowerCase() as 'superUsuario' | 'administrador' | 'lector';
+        const userState = {
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          role: {
+            role: roleName || 'lector',
+            permissions: rolePermissions[roleName] || rolePermissions.lector,
+          },
+        };
+        dispatch(setUser(userState));
+        navigate('/users');
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      alert('Credenciales inválidas');
+    }
+  };
+
+
+  const handle2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/2fa/verify', {
+        userId: tempUser.id,
+        code: twoFACode,
+      });
+      const userData = response.data;
+
+      // Mapear el rol de la API
+      const roleName = userData.roleName?.toLowerCase() as 'superUsuario' | 'administrador' | 'lector';
+      const userState = {
+        id: userData.id,
+        username: userData.username,
+        email: userData.email,
+        role: {
+          role: roleName || 'lector',
+          permissions: rolePermissions[roleName] || rolePermissions.lector,
+        },
+      };
+      dispatch(setUser(userState));
+      setShow2FA(false);
+      setTempUser(null);
+      setTwoFACode('');
+      navigateusers');
+    } catch (error) {
+      console.er('/ror('Error al verificar 2FA:', error);
+      alert('Código 2FA inválido');
+    }
+  };
+  //**** */
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -187,6 +269,78 @@ const Login: React.FC = () => {
       </div>
     </div>
   );
+
+  //** 
+  <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {show2FA ? 'Verificar 2FA' : 'Iniciar Sesión'}
+        </h2>
+        {!show2FA ? (
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Usuario
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
+                required
+                autoComplete="new-username"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
+                required
+                autoComplete="new-password"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handle2FA} className="space-y-6">
+            <div>
+              <label htmlFor="twoFACode" className="block text-sm font-medium text-gray-700">
+                Código 2FA
+              </label>
+              <input
+                type="text"
+                id="twoFACode"
+                value={twoFACode}
+                onChange={(e) => setTwoFACode(e.target.value)}
+                className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm"
+                required
+                autoComplete="off"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Verificar
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+  // */
 };
 
 export default Login;

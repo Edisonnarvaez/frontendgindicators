@@ -1,0 +1,21 @@
+en apid de useSelector
+
+export const restrictBySedeOrArea = <T extends { company?: number; department?: number }>(
+  data: T[],
+  restrictions: UserRole['restrictions']
+): T[] => {
+  if (!restrictions) return data;
+  return data.filter((item) => {
+    const sedeMatch = !restrictions.sede || restrictions.sede.includes(item.company ?? 0);
+    const areaMatch = !restrictions.area || restrictions.area.includes(item.department ?? 0);
+    return sedeMatch && areaMatch;
+  });
+};
+
+
+
+Aplicar en Users.tsx
+
+
+
+const filteredUsers = restrictBySedeOrArea(getFilteredData(users), userRole.restrictions);

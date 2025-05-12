@@ -7,6 +7,7 @@ import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { useRBAC } from '../hooks/useRBAC';
 
 interface User {
   id: number;
@@ -56,7 +57,8 @@ const Users: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const user = useSelector((state: RootState) => state.user) as { id: number; username: string; email: string } | null;
+  const user = useSelector((state: RootState) => state.user);
+  const { checkPermission, getFilteredData } = useRBAC();
 
   const [form, setForm] = useState<Partial<User>>({
     firstName: '',
@@ -71,6 +73,18 @@ const Users: React.FC = () => {
     lastLogin: '',
     password: '',
   });
+
+  // Verificar acceso al módulo
+  if (!checkPermission('users', 'read')) {
+    return (
+      <Layout>
+        <div className="p-6">
+          <h1 className="text-3xl font-bold mb-6">Acceso Denegado</h1>
+          <p>No tienes permisos para acceder a este módulo.</p>
+        </div>
+      </Layout>
+    );
+  }
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -125,36 +139,29 @@ const Users: React.FC = () => {
     fetchRoles();
   }, []);
 
-  useEffect(() => {
-    
-  }, [form]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prevForm) => {
-      const newForm = {
-        ...prevForm,
-        [name]: value,
-      };
-      
-      return newForm;
-    });
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prevForm) => {
-      const newForm = {
-        ...prevForm,
-        [name]: value === 'true',
-      };
-    
-      return newForm;
-    });
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value === 'true',
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!checkPermission('users', 'write')) {
+      notifyError('No tienes permisos para crear o editar usuarios');
+      return;
+    }
 
     const formData = {
       firstName: form.firstName,
@@ -168,7 +175,6 @@ const Users: React.FC = () => {
       status: form.status,
       password: form.password,
     };
-    
 
     try {
       if (isEditing) {
@@ -179,7 +185,6 @@ const Users: React.FC = () => {
         notifySuccess('Usuario actualizado exitosamente');
       } else {
         const response = await api.post(`/users/`, formData);
-      
         setUsers((prev) => [...prev, response.data]);
         notifySuccess('Usuario creado exitosamente');
       }
@@ -209,12 +214,20 @@ const Users: React.FC = () => {
   };
 
   const handleEdit = (user: User) => {
+    if (!checkPermission('users', 'write')) {
+      notifyError('No tienes permisos para editar usuarios');
+      return;
+    }
     setForm(user);
     setIsEditing(true);
     setIsModalOpen(true);
   };
 
   const handleDelete = (id: number) => {
+    if (!checkPermission('users', 'write')) {
+      notifyError('No tienes permisos para eliminar usuarios');
+      return;
+    }
     setUserIdToDelete(id);
     setIsConfirmModalOpen(true);
   };
@@ -238,6 +251,10 @@ const Users: React.FC = () => {
   };
 
   const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    if (!checkPermission('users', 'write')) {
+      notifyError('No tienes permisos para cambiar el estado de usuarios');
+      return;
+    }
     setUserIdToToggle({ id, currentStatus });
     setIsConfirmModalOpen(true);
   };
@@ -272,7 +289,10 @@ const Users: React.FC = () => {
   };
 
   const handleOpenModal = () => {
-    
+    if (!checkPermission('users', 'write')) {
+      notifyError('No tienes permisos para crear usuarios');
+      return;
+    }
     setIsEditing(false);
     const newForm = {
       firstName: '',
@@ -287,10 +307,12 @@ const Users: React.FC = () => {
       lastLogin: '',
       password: '',
     };
-    
     setForm(newForm);
     setIsModalOpen(true);
   };
+
+  // Filtrar usuarios según el rol
+  const filteredUsers = getFilteredData(users);
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
@@ -300,16 +322,15 @@ const Users: React.FC = () => {
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Usuarios</h1>
 
-        {/* Botón para abrir el modal para agregar un nuevo usuario */}
-        <button
-          className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-          onClick={() => {
-            
-            handleOpenModal();
-          }}
-        >
-          Agregar Usuario
-        </button>
+        {/* Botón para agregar usuario, solo visible si tiene permisos de escritura */}
+        {checkPermission('users', 'write') && (
+          <button
+            className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+            onClick={handleOpenModal}
+          >
+            Agregar Usuario
+          </button>
+        )}
 
         {/* Modal de edición/creación */}
         {isModalOpen && (
@@ -589,7 +610,7 @@ const Users: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr key={user.id}>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.firstName}</td>
@@ -602,33 +623,37 @@ const Users: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
-                    <button
-                      className="text-blue-600 hover:text-blue-800"
-                      onClick={() => handleEdit(user)}
-                      title="Editar"
-                    >
-                      <FaEdit size={20} />
-                    </button>
+                    {checkPermission('users', 'write') && (
+                      <>
+                        <button
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => handleEdit(user)}
+                          title="Editar"
+                        >
+                          <FaEdit size={20} />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-800"
+                          onClick={() => handleDelete(user.id)}
+                          title="Eliminar"
+                        >
+                          <FaTrash size={20} />
+                        </button>
+                        <button
+                          className={user.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
+                          onClick={() => handleToggleStatus(user.id, user.status)}
+                          title={user.status ? 'Inactivar' : 'Activar'}
+                        >
+                          {user.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
+                        </button>
+                      </>
+                    )}
                     <button
                       className="text-green-600 hover:text-green-800"
                       onClick={() => handleView(user)}
                       title="Ver"
                     >
                       <FaEye size={20} />
-                    </button>
-                    <button
-                      className="text-red-600 hover:text-red-800"
-                      onClick={() => handleDelete(user.id)}
-                      title="Eliminar"
-                    >
-                      <FaTrash size={20} />
-                    </button>
-                    <button
-                      className={user.status ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'}
-                      onClick={() => handleToggleStatus(user.id, user.status)}
-                      title={user.status ? 'Inactivar' : 'Activar'}
-                    >
-                      {user.status ? <FaToggleOff size={20} /> : <FaToggleOn size={20} />}
                     </button>
                   </td>
                 </tr>

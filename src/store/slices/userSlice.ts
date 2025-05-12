@@ -1,27 +1,34 @@
-// store/slices/userSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { UserState } from '../types/rbac';
 
-interface UserProfile {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: number | null;
-  // Agrega aquí más campos si los necesitas
-}
-
-const initialState: UserProfile | null = null as UserProfile | null;
+const initialState: UserState = {
+  id: 0,
+  username: '',
+  email: '',
+  role: {
+    role: 'lector', // Rol por defecto
+    permissions: [],
+  },
+};
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserProfile: (_state, action: PayloadAction<UserProfile>) => {
-      return action.payload as UserProfile;
+    setUser(state, action: PayloadAction<UserState>) {
+      state.id = action.payload.id;
+      state.username = action.payload.username;
+      state.email = action.payload.email;
+      state.role = action.payload.role;
     },
-    clearUserProfile: () => null,
+    clearUser(state) {
+      state.id = 0;
+      state.username = '';
+      state.email = '';
+      state.role = { role: 'lector', permissions: [] };
+    },
   },
 });
 
-export const { setUserProfile, clearUserProfile } = userSlice.actions;
+export const { setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;

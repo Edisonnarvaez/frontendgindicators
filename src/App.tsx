@@ -24,6 +24,35 @@ import UserInitializer from './components/UserInitializer';
 import Headquarters from './components/Headquarters';
 //import DashboardPage from "./components/Dashboard/DashboardPage";
 
+//**** */
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from './store';
+import { useRBAC } from './hooks/useRBAC';
+import Users from './components/Users';
+import Login from './components/Login';
+import Layout from './components/Layout';
+
+const ProtectedRoute: React.FC<{ children: JSX.Element; module: string }> = ({ children, module }) => {
+  const { checkPermission } = useRBAC();
+  const user = useSelector((state: RootState) => state.user);
+
+  if (!user.id) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!checkPermission(module, 'read')) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
+const App: React.FC = () => {
+
+
+//** */
 function App() {
   return (
     <Provider store={store}>
@@ -69,6 +98,35 @@ function App() {
         theme="light"
       />
     </Provider>
+  );
+
+  <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute module="users">
+              <Layout>
+                <Users />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/unauthorized"
+          element={
+            <Layout>
+              <div className="p-6">
+                <h1 className="text-3xl font-bold mb-6">Acceso Denegado</h1>
+                <p>No tienes permisos para acceder a esta página.</p>
+              </div>
+            </Layout>
+          }
+        />
+        <Route path="/" element={<Navigate to="/users" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
