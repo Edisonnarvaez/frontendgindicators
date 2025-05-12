@@ -615,150 +615,165 @@ const IndicatorComponent: React.FC = () => {
 
       {/* Modal de visualización */}
       {isViewModalOpen && viewResult && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
-            <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
-              {/* Botón de cerrar en la esquina superior derecha */}
-              <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
-                onClick={() => setIsViewModalOpen(false)}
-                aria-label="Cerrar modal"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+          <div className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl p-4 sm:p-6 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+            {/* Botón de cerrar en la esquina superior derecha */}
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-colors"
+              onClick={() => setIsViewModalOpen(false)}
+              aria-label="Cerrar modal"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
 
-              {/* Título del modal */}
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
-                Detalles del Indicador
-              </h2>
+            {/* Título del modal */}
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center tracking-tight">
+              Detalles del Indicador
+            </h2>
 
-              {/* Contenido del modal */}
-              <div className="space-y-4 text-gray-700">
-                <div className="flex justify-between border-b pb-2">
+            {/* Contenido del modal con desplazamiento */}
+            <div className="max-h-[80vh] overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                {/* Información general */}
+                <div className="py-1">
                   <span className="font-medium">Nombre:</span>
-                  <span>{viewResult.name || 'N/A'}</span>
+                  <p>{viewResult.name || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="py-1">
                   <span className="font-medium">Descripción:</span>
-                  <span>{viewResult.description || 'N/A'}</span>
+                  <p>{viewResult.description || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="py-1">
                   <span className="font-medium">Código:</span>
-                  <span>{viewResult.code || 'N/A'}</span>
+                  <p>{viewResult.code || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="py-1">
                   <span className="font-medium">Versión:</span>
-                  <span>{viewResult.version || 'N/A'}</span>
+                  <p>{viewResult.version || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="py-1">
                   <span className="font-medium">Método de Cálculo:</span>
-                  <span>{viewResult.calculationMethod || 'N/A'}</span>
+                  <p>{viewResult.calculationMethod || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="py-1">
                   <span className="font-medium">Unidad de Medida:</span>
-                  <span>{viewResult.measurementUnit || 'N/A'}</span>
+                  <p>{viewResult.measurementUnit || 'N/A'}</p>
                 </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Numerador:</span>
-                  <span>{viewResult.numerator || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Responsable del Numerador:</span>
-                  <span>{viewResult.numeratorResponsible || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Fuente del Numerador:</span>
-                  <span>{viewResult.numeratorSource || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Descripción del Numerador:</span>
-                  <span>{viewResult.numeratorDescription || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Denominador:</span>
-                  <span>{viewResult.denominator || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Responsable del Denominador:</span>
-                  <span>{viewResult.denominatorResponsible || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Fuente del Denominador:</span>
-                  <span>{viewResult.denominatorSource || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Descripción del Denominador:</span>
-                  <span>{viewResult.denominatorDescription || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Meta:</span>
-                  <span>{viewResult.target || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Autor:</span>
-                  <span>{viewResult.author || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Subproceso:</span>
-                  <span>
-                    {subProcesses.find((subProcess) => subProcess.id === viewResult.subProcess)?.name || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Frecuencia de Medición:</span>
-                  <span>{viewResult.measurementFrequency || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium">Estado:</span>
-                  <span>{viewResult.status ? 'Activo' : 'Inactivo'}</span>
-                </div>
-              </div>
 
-              {/* Botón de cerrar en el footer */}
-              <div className="mt-8 flex justify-center">
-                <button
-                  className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
-                  onClick={() => setIsViewModalOpen(false)}
-                >
-                  Cerrar
-                </button>
+                {/* Numerador */}
+                <div className="col-span-1 sm:col-span-2 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Numerador</h3>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Valor:</span>
+                  <p>{viewResult.numerator || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Responsable:</span>
+                  <p>{viewResult.numeratorResponsible || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Fuente:</span>
+                  <p>{viewResult.numeratorSource || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Descripción:</span>
+                  <p>{viewResult.numeratorDescription || 'N/A'}</p>
+                </div>
+
+                {/* Denominador */}
+                <div className="col-span-1 sm:col-span-2 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Denominador</h3>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Valor:</span>
+                  <p>{viewResult.denominator || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Responsable:</span>
+                  <p>{viewResult.denominatorResponsible || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Fuente:</span>
+                  <p>{viewResult.denominatorSource || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Descripción:</span>
+                  <p>{viewResult.denominatorDescription || 'N/A'}</p>
+                </div>
+
+                {/* Otros campos */}
+                <div className="py-1">
+                  <span className="font-medium">Meta:</span>
+                  <p>{viewResult.target || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Autor:</span>
+                  <p>{viewResult.author || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Subproceso:</span>
+                  <p>
+                    {subProcesses.find((subProcess) => subProcess.id === viewResult.subProcess)?.name || 'N/A'}
+                  </p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Frecuencia de Medición:</span>
+                  <p>{viewResult.measurementFrequency || 'N/A'}</p>
+                </div>
+                <div className="py-1">
+                  <span className="font-medium">Estado:</span>
+                  <p>{viewResult.status ? 'Activo' : 'Inactivo'}</p>
+                </div>
               </div>
             </div>
+
+            {/* Botón de cerrar en el footer */}
+            <div className="mt-6 flex justify-center">
+              <button
+                className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                onClick={() => setIsViewModalOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
-        )} 
+        </div>
+      )}
 
       <ConfirmationModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => {
-            setIsConfirmModalOpen(false);
-            setIndicatorIdToDelete(null);
-            setIndicatorToToggle(null);
-          }}
-          onConfirm={() => {
-            if (indicatorIdToDelete) confirmDelete();
-            if (indicatorToToggle) confirmToggleStatus();
-          }}
-          title="Confirmar Acción"
-          message={
-            indicatorIdToDelete
-              ? '¿Estás seguro de que deseas eliminar este indicador? Esta acción no se puede deshacer.'
-              : indicatorToToggle
+        isOpen={isConfirmModalOpen}
+        onClose={() => {
+          setIsConfirmModalOpen(false);
+          setIndicatorIdToDelete(null);
+          setIndicatorToToggle(null);
+        }}
+        onConfirm={() => {
+          if (indicatorIdToDelete) confirmDelete();
+          if (indicatorToToggle) confirmToggleStatus();
+        }}
+        title="Confirmar Acción"
+        message={
+          indicatorIdToDelete
+            ? '¿Estás seguro de que deseas eliminar este indicador? Esta acción no se puede deshacer.'
+            : indicatorToToggle
               ? `¿Estás seguro de que deseas ${indicatorToToggle.currentStatus ? 'inactivar' : 'activar'} este indicador?`
               : '¿Estás seguro de que deseas realizar esta acción?'
-          }
-        />
+        }
+      />
     </Layout>
   );
 };
