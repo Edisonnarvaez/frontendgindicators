@@ -211,7 +211,7 @@ const ResultComponent: React.FC = () => {
     }
 
     const formData = { ...form, user: userId };
-    console.log('Datos enviados al backend:', formData);
+    //console.log('Datos enviados al backend:', formData);
 
     try {
       let newResult: Result;
@@ -224,7 +224,7 @@ const ResultComponent: React.FC = () => {
         setResults((prev) =>
           prev.map((result) => (result.id === newResult.id ? newResult : result))
         );
-        notifySuccess('Resultado actualizado exitosamente');
+        notifySuccess('Metrica actualizada exitosamente');
       } else {
         const response = await api.post('/results/', formData);
         newResult = {
@@ -232,7 +232,7 @@ const ResultComponent: React.FC = () => {
           calculatedValue: response.data.calculatedValue ?? 0,
         };
         setResults((prev) => [...prev, newResult]);
-        notifySuccess('Resultado creado exitosamente');
+        notifySuccess('Metricas añadidas exitosamente');
       }
       setFilteredResults((prev) =>
         [newResult, ...prev.filter((r) => r.id !== newResult.id)].filter(
@@ -241,14 +241,14 @@ const ResultComponent: React.FC = () => {
             (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
         )
       );
-      console.log('Nuevo resultado:', newResult);
-      console.log('Resultados actualizados:', results);
-      console.log('Resultados filtrados actualizados:', filteredResults);
+      //console.log('Nuevo resultado:', newResult);
+      //console.log('Resultados actualizados:', results);
+      //console.log('Resultados filtrados actualizados:', filteredResults);
       resetForm();
     } catch (err: any) {
-      console.error('Error al guardar el resultado:', err);
+      //console.error('Error al guardar el resultado:', err);
       const errorMessage =
-        err.response?.data?.message || 'Error al guardar el resultado';
+        err.response?.data?.message || 'Error al guardar la metrica';
       notifyError(errorMessage);
     }
   };
@@ -276,11 +276,11 @@ const ResultComponent: React.FC = () => {
       await api.delete(`/results/${resultIdToDelete}/`);
       setResults((prev) => prev.filter((r) => r.id !== resultIdToDelete));
       setFilteredResults((prev) => prev.filter((r) => r.id !== resultIdToDelete));
-      notifySuccess('Resultado eliminado exitosamente');
+      notifySuccess('Registro eliminado exitosamente');
     } catch (err: any) {
-      console.error('Error al eliminar el resultado:', err);
+      //console.error('Error al eliminar el registro:', err);
       const errorMessage =
-        err.response?.data?.message || 'Error al eliminar el resultado';
+        err.response?.data?.message || 'Error al eliminar el registro';
       notifyError(errorMessage);
     } finally {
       setResultIdToDelete(null);
@@ -339,14 +339,14 @@ const ResultComponent: React.FC = () => {
                 }}
                 className="mb-2 sm:mb-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                {isFormVisible ? 'Ocultar Formulario' : 'Agregar Resultado'}
+                {isFormVisible ? 'Ocultar Formulario' : 'Agregar Metrica'}
               </button>
             </div>
 
             {isFormVisible && (
               <div className="bg-white p-6 rounded-lg shadow-lg">
                 <h2 className="text-xl font-semibold mb-4 text-center">
-                  {isEditing ? "Editar Resultado" : "Agregar Nuevo Resultado"}
+                  {isEditing ? "Editar Metrica" : "Agregar Nueva Metrica"}
                 </h2>
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
