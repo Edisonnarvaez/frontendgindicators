@@ -173,11 +173,11 @@ const ResultComponent: React.FC = () => {
     if (form.month === undefined || form.month < 1 || form.month > 12) {
       errors.month = 'El mes debe estar entre 1 y 12';
     }
-    if (form.quarter === undefined || form.quarter < 0 || form.quarter > 4) {
-      errors.quarter = 'El trimestre debe estar entre 0 y 4';
+    if (form.quarter === undefined || form.quarter < 1 || form.quarter > 4) {
+      errors.quarter = 'El trimestre debe estar entre 1 y 4';
     }
-    if (form.semester === undefined || form.semester < 0 || form.semester > 2) {
-      errors.semester = 'El semestre debe estar entre 0 y 2';
+    if (form.semester === undefined || form.semester < 1 || form.semester > 2) {
+      errors.semester = 'El semestre debe ser 1 o 2';
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -364,6 +364,9 @@ const ResultComponent: React.FC = () => {
                         </option>
                       ))}
                     </select>
+                    {formErrors.headquarters && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.headquarters}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Indicador</label>
@@ -380,6 +383,9 @@ const ResultComponent: React.FC = () => {
                         </option>
                       ))}
                     </select>
+                    {formErrors.indicator && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.indicator}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Numerador</label>
@@ -390,6 +396,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.numerator && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.numerator}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Denominador</label>
@@ -400,6 +409,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.denominator && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.denominator}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Año</label>
@@ -410,6 +422,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.year && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.year}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Mes</label>
@@ -420,6 +435,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.month && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.month}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Trimestre</label>
@@ -430,6 +448,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.quarter && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.quarter}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Semestre</label>
@@ -440,6 +461,9 @@ const ResultComponent: React.FC = () => {
                       onChange={handleChange}
                       className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    {formErrors.semester && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.semester}</p>
+                    )}
                   </div>
 
                   <div className="sm:col-span-2 flex justify-center space-x-4">
