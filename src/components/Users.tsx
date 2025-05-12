@@ -3,7 +3,7 @@ import Layout from './Layout';
 import api from '../api';
 import { toast } from 'react-toastify';
 import { FaTrash, FaEdit, FaToggleOn, FaToggleOff, FaEye } from 'react-icons/fa';
-import useNotifications from '../hooks/useNotifications'; // Ajusta la ruta
+import useNotifications from '../hooks/useNotifications'; 
 import ConfirmationModal from './ConfirmationModal';
 
 interface User {

@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
 interface Process {
   id: number;
@@ -24,14 +26,17 @@ interface SubProcess {
   process: number;
   user: number;
 }
-
-const SubProcessComponent: React.FC = () => {
+ const SubProcessComponent: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
   const [processes, setProcesses] = useState<Process[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [subProcessIdToDelete, setSubProcessIdToDelete] = useState<number | null>(null);
+  const [subProcessToToggle, setSubProcessToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
 
@@ -51,9 +56,10 @@ const SubProcessComponent: React.FC = () => {
         const response = await api.get('/subprocesses/');
         setSubProcesses(response.data);
         setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch SubProcesses');
+      } catch (err: any) {
+        console.error('Error fetching subprocesses:', err);
+        setError('No se pudieron cargar los subprocesos');
+        notifyError('No se pudieron cargar los subprocesos');
         setLoading(false);
       }
     };
@@ -62,9 +68,10 @@ const SubProcessComponent: React.FC = () => {
       try {
         const response = await api.get('/processes/');
         setProcesses(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Processes');
+      } catch (err: any) {
+        console.error('Error fetching processes:', err);
+        setError('No se pudieron cargar los procesos');
+        notifyError('No se pudieron cargar los procesos');
       }
     };
 
@@ -76,14 +83,7 @@ const SubProcessComponent: React.FC = () => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: name === 'status' ? value === 'true' : value,
-    }));
-  };
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value === 'true',
+      [name]: name === 'status' ? value === 'true' : name === 'process' ? Number(value) : value,
     }));
   };
 
@@ -92,39 +92,29 @@ const SubProcessComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      user: userId, // Usuario fijo, ajusta según sea necesario.
+      user: userId,
     };
 
     try {
       if (isEditing) {
-        const response = await api.put(
-          `/subprocesses/${form.id}/`,
-          formData
-        );
-        alert('SubProceso actualizado exitosamente');
+        const response = await api.put(`/subprocesses/${form.id}/`, formData);
         setSubProcesses((prev) =>
           prev.map((sp) => (sp.id === response.data.id ? response.data : sp))
         );
+        notifySuccess('Subproceso actualizado exitosamente');
       } else {
         const response = await api.post('/subprocesses/', formData);
-        alert('SubProceso creado exitosamente');
         setSubProcesses((prev) => [...prev, response.data]);
+        notifySuccess('Subproceso creado exitosamente');
       }
 
       setIsModalOpen(false);
-      setForm({
-        name: '',
-        description: '',
-        code: '',
-        version: '',
-        author: '',
-        status: true,
-        process: 0,
-      });
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error al guardar los datos', error);
-      alert('Error al crear o actualizar el SubProceso');
+      resetForm();
+    } catch (error: any) {
+      console.error('Error al guardar el subproceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al crear o actualizar el subproceso';
+      notifyError(errorMessage);
     }
   };
 
@@ -135,39 +125,81 @@ const SubProcessComponent: React.FC = () => {
   };
 
   const handleView = (subProcess: SubProcess) => {
-    alert(`Viewing SubProcess: ${subProcess.name}`);
+    notifyError('Función de visualización no implementada');
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar este subproceso?')) return;
+  const handleDelete = (id: number) => {
+    setSubProcessIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!subProcessIdToDelete) return;
 
     try {
-      await api.delete(`/subprocesses/${id}/`);
-      setSubProcesses((prev) => prev.filter((subprocess) => subprocess.id !== id));
-      alert('Subproceso eliminado exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar el subproceso', error);
-      alert('Error al eliminar el subproceso');
+      await api.delete(`/subprocesses/${subProcessIdToDelete}/`);
+      setSubProcesses((prev) => prev.filter((subProcess) => subProcess.id !== subProcessIdToDelete));
+      notifySuccess('Subproceso eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el subproceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el subproceso';
+      notifyError(errorMessage);
+    } finally {
+      setSubProcessIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setSubProcessToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!subProcessToToggle) return;
+
     try {
-      const response = await api.patch(`/subprocesses/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/subprocesses/${subProcessToToggle.id}/`, {
+        status: !subProcessToToggle.currentStatus,
       });
-      setSubProcesses((prevSubProcesses) =>
-        prevSubProcesses.map((subProcess) =>
-          subProcess.id === id ? { ...subProcess, status: response.data.status } : subProcess
+      setSubProcesses((prev) =>
+        prev.map((subProcess) =>
+          subProcess.id === subProcessToToggle.id ? { ...subProcess, status: response.data.status } : subProcess
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
+      notifySuccess(`Subproceso ${subProcessToToggle.currentStatus ? 'inactivado' : 'activado'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del subproceso';
+      notifyError(errorMessage);
+    } finally {
+      setSubProcessToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
+  const resetForm = () => {
+    setForm({
+      name: '',
+      description: '',
+      code: '',
+      version: '',
+      author: '',
+      status: true,
+      process: 0,
+    });
+    setIsEditing(false);
+    setIsModalOpen(false);
+  };
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  const openModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
   return (
@@ -282,7 +314,7 @@ const SubProcessComponent: React.FC = () => {
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
-                      onChange={handleSelectChange}
+                      onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="true">Activo</option>
@@ -371,6 +403,26 @@ const SubProcessComponent: React.FC = () => {
           </table>
         </div>
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setSubProcessIdToDelete(null);
+            setSubProcessToToggle(null);
+          }}
+          onConfirm={() => {
+            if (subProcessIdToDelete) confirmDelete();
+            if (subProcessToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            subProcessIdToDelete
+              ? '¿Estás seguro de que deseas eliminar este subproceso? Esta acción no se puede deshacer.'
+              : subProcessToToggle
+              ? `¿Estás seguro de que deseas ${subProcessToToggle.currentStatus ? 'inactivar' : 'activar'} este subproceso?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
     </Layout>
   );
 };

@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
-import Layout from "./Layout";
-import api from '../api';
+import React, { useState, useEffect, Component, ReactNode } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { FaEdit, FaTrash, FaEye, FaSyncAlt } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; // Ajusta la ruta
+import ConfirmationModal from './ConfirmationModal'; // Ajusta la ruta
+import api from '../api'; // Ajusta la ruta
+import Layout from './Layout'; // Ajusta la ruta
+import type { RootState } from '../store'; // Ajusta la ruta según tu configuración de Redux
 
 interface Headquarters {
   id: number;
@@ -20,19 +23,46 @@ interface Result {
   indicator: number;
   numerator: number;
   denominator: number;
-  calculatedValue: number;
+  calculatedValue: number | null | undefined;
   year: number;
   month: number;
   quarter: number;
   semester: number;
+  user?: number;
+}
+
+// Error Boundary Component
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(_: Error): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 text-red-600">
+          <h2>Algo salió mal.</h2>
+          <p>Por favor, recarga la página o intenta de nuevo.</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 const ResultComponent: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [indicators, setIndicators] = useState<Indicator[]>([]);
   const [headquarters, setHeadquarters] = useState<Headquarters[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [filteredResults, setFilteredResults] = useState<Result[]>([]);
-  const [form, setFormData] = useState<Partial<Result>>({
+  const [form, setForm] = useState<Partial<Result>>({
     headquarters: 0,
     indicator: 0,
     numerator: 0,
@@ -43,12 +73,18 @@ const ResultComponent: React.FC = () => {
     quarter: 0,
     semester: 0,
   });
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof Result, string>>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isFormVisible, setFormVisible] = useState(false);
-  const [headquartersFilter, setHeadquartersFilter] = useState<string>("");
-  const [indicatorFilter, setIndicatorFilter] = useState<string>("");
+  const [headquartersFilter, setHeadquartersFilter] = useState<string>('');
+  const [indicatorFilter, setIndicatorFilter] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [resultIdToDelete, setResultIdToDelete] = useState<number | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewResult, setViewResult] = useState<Result | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
 
@@ -56,9 +92,9 @@ const ResultComponent: React.FC = () => {
     const fetchData = async () => {
       try {
         const [resultsRes, indicatorsRes, headquartersRes] = await Promise.all([
-          api.get("/results/"),
-          api.get("/indicators/"),
-          api.get("/headquarters/"),
+          api.get('/results/'),
+          api.get('/indicators/'),
+          api.get('/headquarters/'),
         ]);
 
         setResults(resultsRes.data);
@@ -66,13 +102,13 @@ const ResultComponent: React.FC = () => {
         setHeadquarters(headquartersRes.data);
         setFilteredResults(resultsRes.data);
         setLoading(false);
-        console.log("Resultados:", resultsRes.data);
-        console.log("Indicadores:", indicatorsRes.data);
-        console.log("Sedes:", headquartersRes.data);  
-        
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar los datos.");
+        console.log('Resultados:', resultsRes.data);
+        console.log('Indicadores:', indicatorsRes.data);
+        console.log('Sedes:', headquartersRes.data);
+      } catch (err: any) {
+        console.error('Error fetching data:', err);
+        setError('No se pudieron cargar los datos');
+        notifyError('No se pudieron cargar los datos');
         setLoading(false);
       }
     };
@@ -80,89 +116,242 @@ const ResultComponent: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...form,
-      [name]: name === "headquarters" || name === "indicator" ? Number(value) : value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      //const formData = { ...form, user: 1 }; // Ajusta el usuario según sea necesario.
-      const formData = { ...form, user: userId };
-      if (isEditing && form.id) {
-        const response = await api.put(`/results/${form.id}/`, formData);
-        setResults((prev) =>
-          prev.map((result) => (result.id === response.data.id ? response.data : result))
-        );
-        alert("Resultado actualizado exitosamente.");
-      } else {
-        const response = await api.post("/results/", formData);
-        setResults((prev) => [...prev, response.data]);
-        alert("Resultado creado exitosamente.");
-      }
-      setFormData({
-        headquarters: 0,
-        indicator: 0,
-        numerator: 0,
-        denominator: 0,
-        calculatedValue: 0,
-        year: new Date().getFullYear(),
-        month: new Date().getMonth() + 1,
-        quarter: 0,
-        semester: 0,
-      });
-      setIsEditing(false);
-    } catch (err) {
-      console.error("Error al guardar el resultado:", err);
-      alert("Error al guardar el resultado.");
-    }
-  };
-
-const handleEdit = (result: Result) => {
-  setFormData(result);
-  setIsEditing(true);
-  setFormVisible(true);
-};
-
-  const toggleFormVisibility = () => {
-    setFormVisible((prev) => !prev);
-  };
-  const handleFilter = () => {
+  useEffect(() => {
     const filtered = results.filter(
       (result) =>
         (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
         (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
     );
     setFilteredResults(filtered);
-  };
-  const handleDelete = async (id: number) => {
-    if (window.confirm("¿Está seguro de eliminar este resultado?")) {
-      try {
-        await api.delete(`/results/${id}/`);
-        setResults((prev) => prev.filter((r) => r.id !== id));
-        alert("Resultado eliminado exitosamente.");
-      } catch (err) {
-        console.error(err);
-        alert("Error al eliminar el resultado.");
-      }
+    console.log('Resultados filtrados:', filtered);
+  }, [results, headquartersFilter, indicatorFilter]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const resultsRes = await api.get('/results/');
+      setResults(resultsRes.data);
+      setFilteredResults(
+        resultsRes.data.filter(
+          (result: Result) =>
+            (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
+            (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
+        )
+      );
+      notifySuccess('Tabla de resultados actualizada');
+      console.log('Resultados recargados:', resultsRes.data);
+    } catch (err: any) {
+      console.error('Error al recargar resultados:', err);
+      notifyError('Error al recargar los resultados');
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
+  const validateForm = (): boolean => {
+    const errors: Partial<Record<keyof Result, string>> = {};
+    if (!form.headquarters || form.headquarters === 0) {
+      errors.headquarters = 'Debe seleccionar una sede';
+    }
+    if (!form.indicator || form.indicator === 0) {
+      errors.indicator = 'Debe seleccionar un indicador';
+    }
+    if (form.numerator === undefined || form.numerator < 0) {
+      errors.numerator = 'El numerador debe ser un número no negativo';
+    }
+    if (form.denominator === undefined || form.denominator < 0) {
+      errors.denominator = 'El denominador debe ser un número no negativo';
+    }
+    if (form.calculatedValue === undefined || form.calculatedValue === null || form.calculatedValue < 0) {
+      errors.calculatedValue = 'El valor calculado debe ser un número no negativo';
+    }
+    if (form.year === undefined || form.year < 1900 || form.year > new Date().getFullYear() + 1) {
+      errors.year = 'El año debe ser válido';
+    }
+    if (form.month === undefined || form.month < 1 || form.month > 12) {
+      errors.month = 'El mes debe estar entre 1 y 12';
+    }
+    if (form.quarter === undefined || form.quarter < 0 || form.quarter > 4) {
+      errors.quarter = 'El trimestre debe estar entre 0 y 4';
+    }
+    if (form.semester === undefined || form.semester < 0 || form.semester > 2) {
+      errors.semester = 'El semestre debe estar entre 0 y 2';
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]:
+        name === 'headquarters' ||
+        name === 'indicator' ||
+        name === 'numerator' ||
+        name === 'denominator' ||
+        name === 'calculatedValue' ||
+        name === 'year' ||
+        name === 'month' ||
+        name === 'quarter' ||
+        name === 'semester'
+          ? Number(value)
+          : value,
+    });
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      notifyError('Por favor, corrige los errores en el formulario');
+      return;
+    }
+
+    const formData = { ...form, user: userId };
+    console.log('Datos enviados al backend:', formData);
+
+    try {
+      let newResult: Result;
+      if (isEditing && form.id) {
+        const response = await api.put(`/results/${form.id}/`, formData);
+        newResult = {
+          ...response.data,
+          calculatedValue: response.data.calculatedValue ?? 0,
+        };
+        setResults((prev) =>
+          prev.map((result) => (result.id === newResult.id ? newResult : result))
+        );
+        notifySuccess('Resultado actualizado exitosamente');
+      } else {
+        const response = await api.post('/results/', formData);
+        newResult = {
+          ...response.data,
+          calculatedValue: response.data.calculatedValue ?? 0,
+        };
+        setResults((prev) => [...prev, newResult]);
+        notifySuccess('Resultado creado exitosamente');
+      }
+      setFilteredResults((prev) =>
+        [newResult, ...prev.filter((r) => r.id !== newResult.id)].filter(
+          (result) =>
+            (headquartersFilter ? result.headquarters === Number(headquartersFilter) : true) &&
+            (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
+        )
+      );
+      console.log('Nuevo resultado:', newResult);
+      console.log('Resultados actualizados:', results);
+      console.log('Resultados filtrados actualizados:', filteredResults);
+      resetForm();
+    } catch (err: any) {
+      console.error('Error al guardar el resultado:', err);
+      const errorMessage =
+        err.response?.data?.message || 'Error al guardar el resultado';
+      notifyError(errorMessage);
+    }
+  };
+
+  const handleEdit = (result: Result) => {
+    setForm(result);
+    setIsEditing(true);
+    setFormVisible(true);
+  };
+
+  const handleView = (result: Result) => {
+    setViewResult(result);
+    setIsViewModalOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    setResultIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!resultIdToDelete) return;
+
+    try {
+      await api.delete(`/results/${resultIdToDelete}/`);
+      setResults((prev) => prev.filter((r) => r.id !== resultIdToDelete));
+      setFilteredResults((prev) => prev.filter((r) => r.id !== resultIdToDelete));
+      notifySuccess('Resultado eliminado exitosamente');
+    } catch (err: any) {
+      console.error('Error al eliminar el resultado:', err);
+      const errorMessage =
+        err.response?.data?.message || 'Error al eliminar el resultado';
+      notifyError(errorMessage);
+    } finally {
+      setResultIdToDelete(null);
+      setIsConfirmModalOpen(false);
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      headquarters: 0,
+      indicator: 0,
+      numerator: 0,
+      denominator: 0,
+      calculatedValue: 0,
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+      quarter: 0,
+      semester: 0,
+    });
+    setFormErrors({});
+    setIsEditing(false);
+    setFormVisible(false);
+  };
+
+  const resetFilters = () => {
+    setHeadquartersFilter('');
+    setIndicatorFilter('');
+  };
+
+  const toggleFormVisibility = () => {
+    setFormVisible((prev) => !prev);
+    if (isFormVisible) resetForm();
+  };
+
+  const formatNumber = (value: number | null | undefined): string => {
+    return value != null && !isNaN(value) ? value.toFixed(2) : '0.00';
+  };
+
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
+  if (error) return <Layout><div>Error: {error}</div></Layout>;
+
   return (
-    <Layout>
-      <div className="p-6 max-w-7xl mx-auto">
+    <ErrorBoundary>
+      <Layout>
+          {/* Formulario */}
+          <div className="p-6 max-w-7xl mx-auto">
         <h1 className="text-3xl font-semibold text-center mb-6">Resultados de Indicadores</h1>
         <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <button
-            onClick={toggleFormVisibility}
-            className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            {isFormVisible ? "Ocultar Formulario" : "Agregar Nuevo Resultado"}
-          </button>
+          <div className="container mx-auto p-4"></div>
+          {/* Botones de acción */}
+          <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+            <button
+              onClick={() => {
+                setFormVisible((prev) => !prev);
+                if (isFormVisible) resetForm();
+              }}
+              className="mb-2 sm:mb-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {isFormVisible ? 'Ocultar Formulario' : 'Agregar Resultado'}
+            </button>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2 ${
+                isRefreshing ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              title="Actualizar tabla"
+              aria-label="Actualizar tabla de resultados"
+            >
+              <FaSyncAlt className={isRefreshing ? 'animate-spin' : ''} />
+              <span>{isRefreshing ? 'Actualizando...' : 'Actualizar'}</span>
+            </button>
+          </div>
 
           {isFormVisible && (
             <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -267,12 +456,12 @@ const handleEdit = (result: Result) => {
                   <button
                     type="button"
                     onClick={() => {
-                      setFormData({
+                      setForm({
                         headquarters: 0,
                         indicator: 0,
                         numerator: 0,
                         denominator: 0,
-                        calculatedValue: 0,
+                        //calculatedValue: 0,
                         year: new Date().getFullYear(),
                         month: new Date().getMonth() + 1,
                         quarter: 0,
@@ -297,103 +486,199 @@ const handleEdit = (result: Result) => {
           )}
         </div>
 
-
-        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-          <div className="flex space-x-4 mb-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600">Sede</label>
-              <select
-                value={headquartersFilter}
-                onChange={(e) => setHeadquartersFilter(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Seleccione...</option>
-                {headquarters.map((hq) => (
-                  <option key={hq.id} value={hq.id}>
-                    {hq.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600">Indicador</label>
-              <select
-                value={indicatorFilter}
-                onChange={(e) => setIndicatorFilter(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Seleccione...</option>
-                {indicators.map((indicator) => (
-                  <option key={indicator.id} value={indicator.id}>
-                    {indicator.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex-1 flex justify-center items-end">
-              <button
-                onClick={handleFilter}
-                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Filtrar
-              </button>
+          {/* Filtros */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-4"> </h2>
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
+              <div>
+                <label htmlFor="headquartersFilter" className="block text-sm font-medium text-gray-700">
+                  Filtrar por Sede
+                </label>
+                <select
+                  name="headquartersFilter"
+                  value={headquartersFilter}
+                  onChange={(e) => setHeadquartersFilter(e.target.value)}
+                  className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Filtrar por sede"
+                >
+                  <option value="">Todas las sedes</option>
+                  {headquarters.map((hq) => (
+                    <option key={hq.id} value={hq.id}>
+                      {hq.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="indicatorFilter" className="block text-sm font-medium text-gray-700">
+                  Filtrar por Indicador
+                </label>
+                <select
+                  name="indicatorFilter"
+                  value={indicatorFilter}
+                  onChange={(e) => setIndicatorFilter(e.target.value)}
+                  className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Filtrar por indicador"
+                >
+                  <option value="">Todos los indicadores</option>
+                  {indicators.map((indicator) => (
+                    <option key={indicator.id} value={indicator.id}>
+                      {indicator.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={resetFilters}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-full sm:w-auto"
+                >
+                  Limpiar Filtros
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        
-        <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2">Sede</th>
-                <th className="px-4 py-2">Indicador</th>
-                <th className="px-4 py-2">Año</th>
-                <th className="px-4 py-2">Numerador</th>
-                <th className="px-4 py-2">Denominador</th>
-                <th className="px-4 py-2">Resultado</th>
-                <th className="px-4 py-2">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredResults.map((result) => {
-                const hqName = headquarters.find((hq) => hq.id === result.headquarters)?.name || "N/A";
-                const indicatorName = indicators.find((ind) => ind.id === result.indicator)?.name || "N/A";
-
-                return (
-                  <tr key={result.id}>
-                    <td className="px-4 py-2">{hqName}</td>
-                    <td className="px-4 py-2">{indicatorName}</td>
-                    <td className="px-4 py-2">{result.year}</td>
-                    <td className="px-4 py-2">{result.numerator}</td>
-                    <td className="px-4 py-2">{result.denominator}</td>
-                    <td className="px-4 py-2">{result.calculatedValue.toFixed(2)}</td>
-                    <td className="px-4 py-2">
-                      <button
-                        className="px-2 py-1 text-white bg-green-500 rounded-md mr-2"
-                        onClick={() => handleEdit(result)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="px-2 py-1 text-white bg-red-500 rounded-md"
-                        onClick={() => result.id && handleDelete(result.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
+          {/* Tabla de resultados */}
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            {filteredResults.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">No hay resultados disponibles</div>
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Sede
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Indicador
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Año
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Numerador
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Denominador
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Resultado
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
                   </tr>
-                );
-              })}
-            </tbody>
-        </table>
-        </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredResults.map((result) => (
+                    <tr key={result.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {headquarters.find((hq) => hq.id === result.headquarters)?.name || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {indicators.find((ind) => ind.id === result.indicator)?.name || 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{result.year}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{result.numerator}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{result.denominator}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatNumber(result.calculatedValue)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
+                        <button
+                          className="text-blue-600 hover:text-blue-800"
+                          onClick={() => handleEdit(result)}
+                          title="Editar"
+                          aria-label="Editar resultado"
+                        >
+                          <FaEdit size={20} />
+                        </button>
+                        <button
+                          className="text-green-600 hover:text-green-800"
+                          onClick={() => handleView(result)}
+                          title="Ver"
+                          aria-label="Ver resultado"
+                        >
+                          <FaEye size={20} />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-800"
+                          onClick={() => result.id && handleDelete(result.id)}
+                          title="Eliminar"
+                          aria-label="Eliminar resultado"
+                        >
+                          <FaTrash size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
 
-        
-      </div>
-    </Layout>
+          {/* Modal de visualización */}
+          {isViewModalOpen && viewResult && (
+            <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
+              <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-md mx-auto my-4 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Detalles del Resultado</h2>
+                <div className="space-y-4">
+                  <p>
+                    <strong>Sede:</strong>{' '}
+                    {headquarters.find((hq) => hq.id === viewResult.headquarters)?.name || 'N/A'}
+                  </p>
+                  <p>
+                    <strong>Indicador:</strong>{' '}
+                    {indicators.find((ind) => ind.id === viewResult.indicator)?.name || 'N/A'}
+                  </p>
+                  <p>
+                    <strong>Numerador:</strong> {viewResult.numerator}
+                  </p>
+                  <p>
+                    <strong>Denominador:</strong> {viewResult.denominator}
+                  </p>
+                  <p>
+                    <strong>Valor Calculado:</strong> {formatNumber(viewResult.calculatedValue)}
+                  </p>
+                  <p>
+                    <strong>Año:</strong> {viewResult.year}
+                  </p>
+                  <p>
+                    <strong>Mes:</strong> {viewResult.month}
+                  </p>
+                  <p>
+                    <strong>Trimestre:</strong> {viewResult.quarter}
+                  </p>
+                  <p>
+                    <strong>Semestre:</strong> {viewResult.semester}
+                  </p>
+                </div>
+                <div className="flex justify-center mt-6">
+                  <button
+                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
+                    onClick={() => setIsViewModalOpen(false)}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <ConfirmationModal
+            isOpen={isConfirmModalOpen}
+            onClose={() => {
+              setIsConfirmModalOpen(false);
+              setResultIdToDelete(null);
+            }}
+            onConfirm={confirmDelete}
+            title="Confirmar Acción"
+            message="¿Estás seguro de que deseas eliminar este resultado? Esta acción no se puede deshacer."
+          />
+        </div>
+      </Layout>
+    </ErrorBoundary>
   );
 };
 

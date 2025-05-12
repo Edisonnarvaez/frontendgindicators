@@ -4,6 +4,8 @@ import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEdit, FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
 interface MacroProcess {
   id: number;
@@ -23,13 +25,18 @@ interface Process {
   user: number;
 }
 
+
 const ProcessComponent: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [processes, setProcesses] = useState<Process[]>([]);
   const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [processIdToDelete, setProcessIdToDelete] = useState<number | null>(null);
+  const [processToToggle, setProcessToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
 
@@ -47,9 +54,10 @@ const ProcessComponent: React.FC = () => {
       try {
         const response = await api.get('/processes/');
         setProcesses(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Processes');
+      } catch (err: any) {
+        console.error('Error fetching processes:', err);
+        setError('No se pudieron cargar los procesos');
+        notifyError('No se pudieron cargar los procesos');
       } finally {
         setLoading(false);
       }
@@ -59,9 +67,10 @@ const ProcessComponent: React.FC = () => {
       try {
         const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch MacroProcesses');
+      } catch (err: any) {
+        console.error('Error fetching macroprocesses:', err);
+        setError('No se pudieron cargar los macroprocesos');
+        notifyError('No se pudieron cargar los macroprocesos');
       }
     };
 
@@ -73,7 +82,7 @@ const ProcessComponent: React.FC = () => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: name === 'status' ? value === 'true' : value,
+      [name]: name === 'status' ? value === 'true' : name === 'macroProcess' ? Number(value) : value,
     }));
   };
 
@@ -91,18 +100,20 @@ const ProcessComponent: React.FC = () => {
         setProcesses((prev) =>
           prev.map((process) => (process.id === response.data.id ? response.data : process))
         );
-        alert('Proceso actualizado exitosamente');
+        notifySuccess('Proceso actualizado exitosamente');
       } else {
         const response = await api.post('/processes/', formData);
         setProcesses((prev) => [...prev, response.data]);
-        alert('Proceso creado exitosamente');
+        notifySuccess('Proceso creado exitosamente');
       }
 
       setIsModalOpen(false);
       resetForm();
-    } catch (error) {
-      console.error('Error al guardar el proceso', error);
-      alert('Error al guardar el proceso');
+    } catch (error: any) {
+      console.error('Error al guardar el proceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al guardar el proceso';
+      notifyError(errorMessage);
     }
   };
 
@@ -113,35 +124,58 @@ const ProcessComponent: React.FC = () => {
   };
 
   const handleView = (process: Process) => {
-    alert(`Viewing process: ${process.name}`);
+    notifyError('Función de visualización no implementada');
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar este proceso?')) return;
+  const handleDelete = (id: number) => {
+    setProcessIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!processIdToDelete) return;
 
     try {
-      await api.delete(`/processes/${id}/`);
-      setProcesses((prev) => prev.filter((process) => process.id !== id));
-      alert('Proceso eliminado exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar el proceso', error);
-      alert('Error al eliminar el proceso');
+      await api.delete(`/processes/${processIdToDelete}/`);
+      setProcesses((prev) => prev.filter((process) => process.id !== processIdToDelete));
+      notifySuccess('Proceso eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el proceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el proceso';
+      notifyError(errorMessage);
+    } finally {
+      setProcessIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setProcessToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!processToToggle) return;
+
     try {
-      const response = await api.patch(`/processes/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/processes/${processToToggle.id}/`, {
+        status: !processToToggle.currentStatus,
       });
       setProcesses((prev) =>
         prev.map((process) =>
-          process.id === id ? { ...process, status: response.data.status } : process
+          process.id === processToToggle.id ? { ...process, status: response.data.status } : process
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
-      alert('Error al cambiar el estado del proceso');
+      notifySuccess(`Proceso ${processToToggle.currentStatus ? 'inactivado' : 'activado'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del proceso';
+      notifyError(errorMessage);
+    } finally {
+      setProcessToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
@@ -163,7 +197,7 @@ const ProcessComponent: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
   return (
@@ -340,6 +374,26 @@ const ProcessComponent: React.FC = () => {
           </table>
         </div>
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setProcessIdToDelete(null);
+            setProcessToToggle(null);
+          }}
+          onConfirm={() => {
+            if (processIdToDelete) confirmDelete();
+            if (processToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            processIdToDelete
+              ? '¿Estás seguro de que deseas eliminar este proceso? Esta acción no se puede deshacer.'
+              : processToToggle
+              ? `¿Estás seguro de que deseas ${processToToggle.currentStatus ? 'inactivar' : 'activar'} este proceso?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
     </Layout>
   );
 };

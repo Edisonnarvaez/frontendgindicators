@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEdit } from 'react-icons/fa';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
+import useNotifications from '../hooks/useNotifications';
+import ConfirmationModal from './ConfirmationModal';
 
 interface company {
     id: number;
@@ -34,7 +36,11 @@ const Headquarter: React.FC = () => {
     const userId = user ? user.id : null;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const { notifySuccess, notifyError } = useNotifications(); const [headquarterIdToDelete, setHeadquarterIdToDelete] = useState<number | null>(null);
+    const [headquarterToToggle, setHeadquarterToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
     const [form, setForm] = useState<Partial<Headquarter>>({
+
         name: '',
         habilitationCode: '',
         company: 0,
@@ -53,27 +59,27 @@ const Headquarter: React.FC = () => {
                 const response = await api.get('/headquarters/');
                 setHeadquarters(response.data);
                 setLoading(false);
-            } catch (err) {
-                setError('Failed to fetch headquarters');
-                setLoading(false);
-            } finally {
+            } catch (err: any) {
+                console.error('Error fetching headquarters:', err);
+                setError('No se pudieron cargar las sedes');
+                notifyError('No se pudieron cargar las sedes');
                 setLoading(false);
             }
         };
+
         const fetchCompanies = async () => {
             try {
                 const response = await api.get('/companies/');
                 setCompanies(response.data);
-            } catch (err) {
-                console.error(err);
-                setError('Failed to fetch Companies');
+            } catch (err: any) {
+                console.error('Error fetching companies:', err);
+                setError('No se pudieron cargar las empresas');
+                notifyError('No se pudieron cargar las empresas');
             }
         };
 
-
         fetchHeadquarters();
         fetchCompanies();
-        //fetchMacroProcesses();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -91,7 +97,6 @@ const Headquarter: React.FC = () => {
             ...form,
             user: userId,
         };
-        console.log(formData);
 
         try {
             if (isEditing) {
@@ -99,18 +104,20 @@ const Headquarter: React.FC = () => {
                 setHeadquarters((prev) =>
                     prev.map((headquarter) => (headquarter.id === response.data.id ? response.data : headquarter))
                 );
-                alert('Sede actualizada exitosamente');
+                notifySuccess('Sede actualizada exitosamente');
             } else {
                 const response = await api.post('/headquarters/', formData);
                 setHeadquarters((prev) => [...prev, response.data]);
-                alert('Sede creada exitosamente');
+                notifySuccess('Sede creada exitosamente');
             }
 
             setIsModalOpen(false);
             resetForm();
-        } catch (error) {
-            console.error('Error al guardar la sede', error);
-            alert('Error al guardar la sede');
+        } catch (error: any) {
+            console.error('Error al guardar la sede:', error);
+            const errorMessage =
+                error.response?.data?.message || 'Error al guardar la sede';
+            notifyError(errorMessage);
         }
     };
 
@@ -121,35 +128,58 @@ const Headquarter: React.FC = () => {
     };
 
     const handleView = (headquarter: Headquarter) => {
-        alert(`Viewing details for: ${headquarter.name}`);
+        notifyError('Función de visualización no implementada');
     };
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm('¿Está seguro de eliminar esta sede?')) return;
+    const handleDelete = (id: number) => {
+        setHeadquarterIdToDelete(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!headquarterIdToDelete) return;
 
         try {
-            await api.delete(`/headquarters/${id}/`);
-            setHeadquarters((prev) => prev.filter((headquarter) => headquarter.id !== id));
-            alert('Sede eliminada exitosamente');
-        } catch (error) {
-            console.error('Error al eliminar la sede', error);
-            alert('Error al eliminar la sede');
+            await api.delete(`/headquarters/${headquarterIdToDelete}/`);
+            setHeadquarters((prev) => prev.filter((headquarter) => headquarter.id !== headquarterIdToDelete));
+            notifySuccess('Sede eliminada exitosamente');
+        } catch (error: any) {
+            console.error('Error al eliminar la sede:', error);
+            const errorMessage =
+                error.response?.data?.message || 'Error al eliminar la sede';
+            notifyError(errorMessage);
+        } finally {
+            setHeadquarterIdToDelete(null);
+            setIsConfirmModalOpen(false);
         }
     };
 
-    const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+    const handleToggleStatus = (id: number, currentStatus: boolean) => {
+        setHeadquarterToToggle({ id, currentStatus });
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmToggleStatus = async () => {
+        if (!headquarterToToggle) return;
+
         try {
-            const response = await api.patch(`/headquarters/${id}/`, {
-                status: !currentStatus,
+            const response = await api.patch(`/headquarters/${headquarterToToggle.id}/`, {
+                status: !headquarterToToggle.currentStatus,
             });
             setHeadquarters((prev) =>
                 prev.map((headquarter) =>
-                    headquarter.id === id ? { ...headquarter, status: response.data.status } : headquarter
+                    headquarter.id === headquarterToToggle.id ? { ...headquarter, status: response.data.status } : headquarter
                 )
             );
-        } catch (error) {
-            console.error('Error al cambiar el estado', error);
-            alert('Error al cambiar el estado de la sede');
+            notifySuccess(`Sede ${headquarterToToggle.currentStatus ? 'inactivada' : 'activada'} exitosamente`);
+        } catch (error: any) {
+            console.error('Error al cambiar el estado:', error);
+            const errorMessage =
+                error.response?.data?.message || 'Error al cambiar el estado de la sede';
+            notifyError(errorMessage);
+        } finally {
+            setHeadquarterToToggle(null);
+            setIsConfirmModalOpen(false);
         }
     };
 
@@ -222,7 +252,7 @@ const Headquarter: React.FC = () => {
                                         <label htmlFor="company" className="block text-sm font-medium text-gray-700">Empresa</label>
                                         <select
                                             name="company"
-                                            value={form.company || ''}
+                                            value={form.company || 0}
                                             onChange={handleChange}
                                             className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                             required
@@ -392,6 +422,26 @@ const Headquarter: React.FC = () => {
                     </table>
                 </div>
             </div>
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => {
+                    setIsConfirmModalOpen(false);
+                    setHeadquarterIdToDelete(null);
+                    setHeadquarterToToggle(null);
+                }}
+                onConfirm={() => {
+                    if (headquarterIdToDelete) confirmDelete();
+                    if (headquarterToToggle) confirmToggleStatus();
+                }}
+                title="Confirmar Acción"
+                message={
+                    headquarterIdToDelete
+                        ? '¿Estás seguro de que deseas eliminar esta sede? Esta acción no se puede deshacer.'
+                        : headquarterToToggle
+                            ? `¿Estás seguro de que deseas ${headquarterToToggle.currentStatus ? 'inactivar' : 'activar'} esta sede?`
+                            : '¿Estás seguro de que deseas realizar esta acción?'
+                }
+            />
         </Layout>
     );
 };

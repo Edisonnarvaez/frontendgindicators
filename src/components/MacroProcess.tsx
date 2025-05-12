@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
 interface Department {
   id: number;
@@ -25,6 +27,7 @@ interface MacroProcess {
 }
 
 const MacroProcessComponent: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [macroProcesses, setMacroProcesses] = useState<MacroProcess[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +35,10 @@ const MacroProcessComponent: React.FC = () => {
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Estado para saber si estamos en edición
+  const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [macroProcessIdToDelete, setMacroProcessIdToDelete] = useState<number | null>(null);
+  const [macroProcessToToggle, setMacroProcessToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
 
   const [form, setForm] = useState<Partial<MacroProcess>>({
     name: '',
@@ -49,9 +55,10 @@ const MacroProcessComponent: React.FC = () => {
         const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
         setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch MacroProcesses');
+      } catch (err: any) {
+        console.error('Error fetching macroprocesses:', err);
+        setError('No se pudieron cargar los macroprocesos');
+        notifyError('No se pudieron cargar los macroprocesos');
         setLoading(false);
       }
     };
@@ -60,9 +67,10 @@ const MacroProcessComponent: React.FC = () => {
       try {
         const response = await api.get('/departments/');
         setDepartments(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Departments');
+      } catch (err: any) {
+        console.error('Error fetching departments:', err);
+        setError('No se pudieron cargar las áreas');
+        notifyError('No se pudieron cargar las áreas');
       }
     };
 
@@ -74,15 +82,7 @@ const MacroProcessComponent: React.FC = () => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: value,
-    }));
-  };
-
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value === 'true',
+      [name]: name === 'status' ? value === 'true' : name === 'department' ? Number(value) : value,
     }));
   };
 
@@ -91,40 +91,29 @@ const MacroProcessComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      status: form.status,
-      department: form.department,
       user: userId,
     };
 
     try {
       if (isEditing) {
-        const response = await api.put(
-          `/macroprocesses/${form.id}/`,
-          formData
-        );
-        alert('Macroproceso actualizado exitosamente');
+        const response = await api.put(`/macroprocesses/${form.id}/`, formData);
         setMacroProcesses((prev) =>
           prev.map((mp) => (mp.id === response.data.id ? response.data : mp))
         );
+        notifySuccess('Macroproceso actualizado exitosamente');
       } else {
         const response = await api.post('/macroprocesses/', formData);
-        alert('Macroproceso creado exitosamente');
         setMacroProcesses((prev) => [...prev, response.data]);
+        notifySuccess('Macroproceso creado exitosamente');
       }
 
       setIsModalOpen(false);
-      setForm({
-        name: '',
-        description: '',
-        department: 0,
-        code: '',
-        version: '',
-        status: true,
-      });
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error al guardar los datos', error);
-      alert('Error al crear o actualizar el macroproceso');
+      resetForm();
+    } catch (error: any) {
+      console.error('Error al guardar el macroproceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al crear o actualizar el macroproceso';
+      notifyError(errorMessage);
     }
   };
 
@@ -135,40 +124,62 @@ const MacroProcessComponent: React.FC = () => {
   };
 
   const handleView = (macroProcess: MacroProcess) => {
-    alert(`Viewing MacroProcess: ${macroProcess.name}`);
+    notifyError('Función de visualización no implementada');
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar este macroproceso?')) return;
+  const handleDelete = (id: number) => {
+    setMacroProcessIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!macroProcessIdToDelete) return;
 
     try {
-      await api.delete(`/macroprocesses/${id}/`);
-      setMacroProcesses((prev) => prev.filter((macroProcess) => macroProcess.id !== id));
-      alert('Macroproceso eliminado exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar el macroproceso', error);
-      alert('Error al eliminar el macroproceso');
+      await api.delete(`/macroprocesses/${macroProcessIdToDelete}/`);
+      setMacroProcesses((prev) => prev.filter((macroProcess) => macroProcess.id !== macroProcessIdToDelete));
+      notifySuccess('Macroproceso eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el macroproceso:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el macroproceso';
+      notifyError(errorMessage);
+    } finally {
+      setMacroProcessIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setMacroProcessToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!macroProcessToToggle) return;
+
     try {
-      const response = await api.patch(`/macroprocesses/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/macroprocesses/${macroProcessToToggle.id}/`, {
+        status: !macroProcessToToggle.currentStatus,
       });
-      setMacroProcesses((prevMacroProcesses) =>
-        prevMacroProcesses.map((macroProcess) =>
-          macroProcess.id === id ? { ...macroProcess, status: response.data.status } : macroProcess
+      setMacroProcesses((prev) =>
+        prev.map((macroProcess) =>
+          macroProcess.id === macroProcessToToggle.id ? { ...macroProcess, status: response.data.status } : macroProcess
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
+      notifySuccess(`Macroproceso ${macroProcessToToggle.currentStatus ? 'inactivado' : 'activado'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del macroproceso';
+      notifyError(errorMessage);
+    } finally {
+      setMacroProcessToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  // Abrir modal para agregar macroproceso (limpio, sin datos)
-  const handleOpenModal = () => {
-    setIsEditing(false);  // Establecer isEditing en false para asegurar que estamos en modo de creación
+  const resetForm = () => {
     setForm({
       name: '',
       description: '',
@@ -176,11 +187,17 @@ const MacroProcessComponent: React.FC = () => {
       code: '',
       version: '',
       status: true,
-    });  // Limpiar el formulario
+    });
+    setIsEditing(false);
+    setIsModalOpen(false);
+  };
+
+  const handleOpenModal = () => {
+    resetForm();
     setIsModalOpen(true);
   };
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
   return (
@@ -272,7 +289,7 @@ const MacroProcessComponent: React.FC = () => {
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
-                      onChange={handleSelectChange}
+                      onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="true">Activo</option>
@@ -360,6 +377,26 @@ const MacroProcessComponent: React.FC = () => {
           </table>
         </div>
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setMacroProcessIdToDelete(null);
+            setMacroProcessToToggle(null);
+          }}
+          onConfirm={() => {
+            if (macroProcessIdToDelete) confirmDelete();
+            if (macroProcessToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            macroProcessIdToDelete
+              ? '¿Estás seguro de que deseas eliminar este macroproceso? Esta acción no se puede deshacer.'
+              : macroProcessToToggle
+              ? `¿Estás seguro de que deseas ${macroProcessToToggle.currentStatus ? 'inactivar' : 'activar'} este macroproceso?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
     </Layout>
   );
 };

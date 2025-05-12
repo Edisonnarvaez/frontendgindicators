@@ -4,6 +4,8 @@ import api from '../api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEdit, FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
 interface SubProcess {
   id: number;
@@ -35,12 +37,16 @@ interface Indicator {
 }
 
 const IndicatorComponent: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [indicators, setIndicators] = useState<Indicator[]>([]);
   const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [indicatorIdToDelete, setIndicatorIdToDelete] = useState<number | null>(null);
+  const [indicatorToToggle, setIndicatorToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
 
@@ -64,7 +70,6 @@ const IndicatorComponent: React.FC = () => {
     subProcess: 0,
     measurementFrequency: '',
     status: true,
-
   });
 
   useEffect(() => {
@@ -73,9 +78,10 @@ const IndicatorComponent: React.FC = () => {
         const response = await api.get('/indicators/');
         setIndicators(response.data);
         setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch indicador');
+      } catch (err: any) {
+        console.error('Error fetching indicators:', err);
+        setError('No se pudieron cargar los indicadores');
+        notifyError('No se pudieron cargar los indicadores');
         setLoading(false);
       }
     };
@@ -84,9 +90,10 @@ const IndicatorComponent: React.FC = () => {
       try {
         const response = await api.get('/subprocesses/');
         setSubProcesses(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Indicators');
+      } catch (err: any) {
+        console.error('Error fetching subprocesses:', err);
+        setError('No se pudieron cargar los subprocesos');
+        notifyError('No se pudieron cargar los subprocesos');
       }
     };
 
@@ -94,19 +101,11 @@ const IndicatorComponent: React.FC = () => {
     fetchIndicators();
   }, []);
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: name === 'status' ? value === 'true' : value,
-    }));
-  };
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value === 'true',
+      [name]: name === 'status' ? value === 'true' : name === 'subProcess' ? Number(value) : value,
     }));
   };
 
@@ -115,54 +114,30 @@ const IndicatorComponent: React.FC = () => {
 
     const formData = {
       ...form,
-      user: userId, // Usuario fijo, ajusta según sea necesario.
+      user: userId,
     };
-    //quiero imprimir lo que se estan enviando al backend
-    console.log(formData);
+    console.log('Datos enviados al backend:', formData);
 
     try {
       if (isEditing) {
-        const response = await api.put(
-          `/indicators/${form.id}/`,
-          formData
-        );
-        alert('Indicador actualizado exitosamente');
+        const response = await api.put(`/indicators/${form.id}/`, formData);
         setIndicators((prev) =>
-          prev.map((sp) => (sp.id === response.data.id ? response.data : sp))
+          prev.map((indicator) => (indicator.id === response.data.id ? response.data : indicator))
         );
+        notifySuccess('Indicador actualizado exitosamente');
       } else {
         const response = await api.post('/indicators/', formData);
-        alert('Indicador creado exitosamente');
         setIndicators((prev) => [...prev, response.data]);
+        notifySuccess('Indicador creado exitosamente');
       }
 
       setIsModalOpen(false);
-      setForm({
-        name: '',
-        description: '',
-        code: '',
-        version: '',
-        calculationMethod: '',
-        measurementUnit: '',
-        numerator: '',
-        numeratorResponsible: '',
-        numeratorSource: '',
-        numeratorDescription: '',
-        denominator: '',
-        denominatorResponsible: '',
-        denominatorSource: '',
-        denominatorDescription: '',
-        target: '',
-        author: '',
-        subProcess: 0,
-        measurementFrequency: '',
-        status: true,
-
-      });
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error al guardar los datos', error);
-      alert('Error al crear o actualizar el Indicador');
+      resetForm();
+    } catch (error: any) {
+      console.error('Error al guardar el indicador:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al crear o actualizar el indicador';
+      notifyError(errorMessage);
     }
   };
 
@@ -173,38 +148,93 @@ const IndicatorComponent: React.FC = () => {
   };
 
   const handleView = (indicator: Indicator) => {
-    alert(`Viewing indicator: ${indicator.name}`);
+    notifyError('Función de visualización no implementada');
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar este indicador?')) return;
+  const handleDelete = (id: number) => {
+    setIndicatorIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!indicatorIdToDelete) return;
+
     try {
-      await api.delete(`/indicators/${id}/`);
-      setIndicators((prev) => prev.filter((indicator) => indicator.id !== id));
-      alert('Indicador eliminado exitosamente');
-    } catch (error) {
-      console.error('Error deleting indicator', error);
-      alert('Error al eliminar el indicador');
+      await api.delete(`/indicators/${indicatorIdToDelete}/`);
+      setIndicators((prev) => prev.filter((indicator) => indicator.id !== indicatorIdToDelete));
+      notifySuccess('Indicador eliminado exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el indicador:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el indicador';
+      notifyError(errorMessage);
+    } finally {
+      setIndicatorIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setIndicatorToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!indicatorToToggle) return;
+
     try {
-      const response = await api.patch(`/indicators/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/indicators/${indicatorToToggle.id}/`, {
+        status: !indicatorToToggle.currentStatus,
       });
       setIndicators((prev) =>
         prev.map((indicator) =>
-          indicator.id === id ? { ...indicator, status: response.data.status } : indicator
+          indicator.id === indicatorToToggle.id ? { ...indicator, status: response.data.status } : indicator
         )
       );
-    } catch (error) {
-      console.error('Error toggling status', error);
-      alert('Error al cambiar el estado');
+      notifySuccess(`Indicador ${indicatorToToggle.currentStatus ? 'inactivado' : 'activado'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del indicador';
+      notifyError(errorMessage);
+    } finally {
+      setIndicatorToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  const resetForm = () => {
+    setForm({
+      name: '',
+      description: '',
+      code: '',
+      version: '',
+      calculationMethod: '',
+      measurementUnit: '',
+      numerator: '',
+      numeratorResponsible: '',
+      numeratorSource: '',
+      numeratorDescription: '',
+      denominator: '',
+      denominatorResponsible: '',
+      denominatorSource: '',
+      denominatorDescription: '',
+      target: '',
+      author: '',
+      subProcess: 0,
+      measurementFrequency: '',
+      status: true,
+    });
+    setIsEditing(false);
+    setIsModalOpen(false);
+  };
+
+  const openModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
 
   return (
@@ -484,7 +514,7 @@ const IndicatorComponent: React.FC = () => {
                     <select
                       name="status"
                       value={form.status ? 'true' : 'false'}
-                      onChange={handleSelectChange}
+                      onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="true">Activo</option>
@@ -579,6 +609,26 @@ const IndicatorComponent: React.FC = () => {
           </table>
         </div>
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setIndicatorIdToDelete(null);
+            setIndicatorToToggle(null);
+          }}
+          onConfirm={() => {
+            if (indicatorIdToDelete) confirmDelete();
+            if (indicatorToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            indicatorIdToDelete
+              ? '¿Estás seguro de que deseas eliminar este indicador? Esta acción no se puede deshacer.'
+              : indicatorToToggle
+              ? `¿Estás seguro de que deseas ${indicatorToToggle.currentStatus ? 'inactivar' : 'activar'} este indicador?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
     </Layout>
   );
 };

@@ -5,8 +5,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
-interface company {
+interface Company {
   id: number;
   name: string;
 }
@@ -22,25 +24,26 @@ interface Department {
 }
 
 const Departments: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [companies, setCompanies] = useState<company[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [departmentIdToDelete, setDepartmentIdToDelete] = useState<number | null>(null);
+  const [departmentToToggle, setDepartmentToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
 
   const [form, setForm] = useState<Partial<Department>>({
     name: '',
     departmentCode: '',
     company: 0,
     description: '',
-    //creationDate: new Date(),  // Cambiado a Date
-    //creationDate: '',
     status: true,
   });
-
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -48,10 +51,10 @@ const Departments: React.FC = () => {
         const response = await api.get('/departments/');
         setDepartments(response.data);
         setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch departments');
-        setLoading(false);
-      } finally {
+      } catch (err: any) {
+        console.error('Error fetching departments:', err);
+        setError('No se pudieron cargar las áreas');
+        notifyError('No se pudieron cargar las áreas');
         setLoading(false);
       }
     };
@@ -60,9 +63,10 @@ const Departments: React.FC = () => {
       try {
         const response = await api.get('/companies/');
         setCompanies(response.data);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to fetch Companies');
+      } catch (err: any) {
+        console.error('Error fetching companies:', err);
+        setError('No se pudieron cargar las empresas');
+        notifyError('No se pudieron cargar las empresas');
       }
     };
 
@@ -84,13 +88,7 @@ const Departments: React.FC = () => {
     const formData = {
       ...form,
       user: userId,
-      //user: 1,
-      //creationDate: form.creationDate instanceof Date
-      //  ? form.creationDate.toISOString().split('T')[0]
-      //  : form.creationDate,
-      //creationDate: form.creationDate ? form.creationDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0], // Cambiado a ISO String
     };
-    console.log(formData);
 
     try {
       if (isEditing) {
@@ -98,18 +96,20 @@ const Departments: React.FC = () => {
         setDepartments((prev) =>
           prev.map((department) => (department.id === response.data.id ? response.data : department))
         );
-        alert('Area actualizada exitosamente');
+        notifySuccess('Área actualizada exitosamente');
       } else {
         const response = await api.post('/departments/', formData);
         setDepartments((prev) => [...prev, response.data]);
-        alert('Area creada exitosamente');
+        notifySuccess('Área creada exitosamente');
       }
 
       setIsModalOpen(false);
       resetForm();
-    } catch (error) {
-      console.error('Error al guardar el proceso', error);
-      alert('Error al guardar el proceso');
+    } catch (error: any) {
+      console.error('Error al guardar el área:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al guardar el área';
+      notifyError(errorMessage);
     }
   };
 
@@ -120,35 +120,58 @@ const Departments: React.FC = () => {
   };
 
   const handleView = (department: Department) => {
-    alert(`Viewing department: ${department.name}`);
+    notifyError('Función de visualización no implementada');
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar esta area?')) return;
+  const handleDelete = (id: number) => {
+    setDepartmentIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!departmentIdToDelete) return;
 
     try {
-      await api.delete(`/departments/${id}/`);
-      setDepartments((prev) => prev.filter((department) => department.id !== id));
-      alert('Area eliminada exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar area', error);
-      alert('Error al eliminar el area');
+      await api.delete(`/departments/${departmentIdToDelete}/`);
+      setDepartments((prev) => prev.filter((department) => department.id !== departmentIdToDelete));
+      notifySuccess('Área eliminada exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar el área:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar el área';
+      notifyError(errorMessage);
+    } finally {
+      setDepartmentIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setDepartmentToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!departmentToToggle) return;
+
     try {
-      const response = await api.patch(`/departments/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/departments/${departmentToToggle.id}/`, {
+        status: !departmentToToggle.currentStatus,
       });
       setDepartments((prev) =>
         prev.map((department) =>
-          department.id === id ? { ...department, status: response.data.status } : department
+          department.id === departmentToToggle.id ? { ...department, status: response.data.status } : department
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
-      alert('Error al cambiar el estado del area');
+      notifySuccess(`Área ${departmentToToggle.currentStatus ? 'inactivada' : 'activada'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado del área';
+      notifyError(errorMessage);
+    } finally {
+      setDepartmentToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
@@ -158,8 +181,6 @@ const Departments: React.FC = () => {
       departmentCode: '',
       company: 0,
       description: '',
-      //creationDate: new Date(),  // Cambiado a Date
-      //creationDate: ,
       status: true,
     });
     setIsEditing(false);
@@ -170,7 +191,6 @@ const Departments: React.FC = () => {
     resetForm();
     setIsModalOpen(true);
   };
-
 
   if (loading) return <Layout><div>Cargando...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
@@ -338,6 +358,26 @@ const Departments: React.FC = () => {
           </table>
         </div>
       </div>
+      <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setDepartmentIdToDelete(null);
+            setDepartmentToToggle(null);
+          }}
+          onConfirm={() => {
+            if (departmentIdToDelete) confirmDelete();
+            if (departmentToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            departmentIdToDelete
+              ? '¿Estás seguro de que deseas eliminar esta área? Esta acción no se puede deshacer.'
+              : departmentToToggle
+              ? `¿Estás seguro de que deseas ${departmentToToggle.currentStatus ? 'inactivar' : 'activar'} esta área?`
+              : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
     </Layout>
   );
 };

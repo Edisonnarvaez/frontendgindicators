@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
+import useNotifications from '../hooks/useNotifications'; 
+import ConfirmationModal from './ConfirmationModal';
 
 interface Company {
   id: number;
@@ -20,6 +22,7 @@ interface Company {
 }
 
 const Companies: React.FC = () => {
+  const { notifySuccess, notifyError } = useNotifications();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +31,14 @@ const Companies: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [companyIdToDelete, setCompanyIdToDelete] = useState<number | null>(null);
+  const [companyToToggle, setCompanyToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
+
+  //**********0 */
+ 
+  //******** */
+
   const [form, setForm] = useState<Partial<Company>>({
     name: '',
     nit: '',
@@ -37,7 +48,6 @@ const Companies: React.FC = () => {
     contactEmail: '',
     foundationDate: '',
     status: true,
-
   });
 
   useEffect(() => {
@@ -46,17 +56,15 @@ const Companies: React.FC = () => {
         const response = await api.get('/companies/');
         setCompanies(response.data);
         setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch companies');
-        setLoading(false);
-      } finally {
+      } catch (err: any) {
+        console.error('Error fetching companies:', err);
+        setError('No se pudieron cargar las empresas');
+        notifyError('No se pudieron cargar las empresas');
         setLoading(false);
       }
     };
 
-
     fetchCompanies();
-    //fetchMacroProcesses();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -74,7 +82,6 @@ const Companies: React.FC = () => {
       ...form,
       user: userId,
     };
-    console.log(formData);
 
     try {
       if (isEditing) {
@@ -82,18 +89,20 @@ const Companies: React.FC = () => {
         setCompanies((prev) =>
           prev.map((company) => (company.id === response.data.id ? response.data : company))
         );
-        alert('Empresa actualizada exitosamente');
+        notifySuccess('Empresa actualizada exitosamente');
       } else {
         const response = await api.post('/companies/', formData);
         setCompanies((prev) => [...prev, response.data]);
-        alert('Empresa creada exitosamente');
+        notifySuccess('Empresa creada exitosamente');
       }
 
       setIsModalOpen(false);
       resetForm();
-    } catch (error) {
-      console.error('Error al guardar la empresa', error);
-      alert('Error al guardar la empresa');
+    } catch (error: any) {
+      console.error('Error al guardar la empresa:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al guardar la empresa';
+      notifyError(errorMessage);
     }
   };
 
@@ -103,32 +112,55 @@ const Companies: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro de eliminar esta empresa?')) return;
+  const handleDelete = (id: number) => {
+    setCompanyIdToDelete(id);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!companyIdToDelete) return;
 
     try {
-      await api.delete(`/companies/${id}/`);
-      setCompanies((prev) => prev.filter((company) => company.id !== id));
-      alert('Epresa eliminada exitosamente');
-    } catch (error) {
-      console.error('Error al eliminar la empresa', error);
-      alert('Error al eliminar la empresa');
+      await api.delete(`/companies/${companyIdToDelete}/`);
+      setCompanies((prev) => prev.filter((company) => company.id !== companyIdToDelete));
+      notifySuccess('Empresa eliminada exitosamente');
+    } catch (error: any) {
+      console.error('Error al eliminar la empresa:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al eliminar la empresa';
+      notifyError(errorMessage);
+    } finally {
+      setCompanyIdToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = (id: number, currentStatus: boolean) => {
+    setCompanyToToggle({ id, currentStatus });
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmToggleStatus = async () => {
+    if (!companyToToggle) return;
+
     try {
-      const response = await api.patch(`/companies/${id}/`, {
-        status: !currentStatus,
+      const response = await api.patch(`/companies/${companyToToggle.id}/`, {
+        status: !companyToToggle.currentStatus,
       });
       setCompanies((prev) =>
         prev.map((company) =>
-          company.id === id ? { ...company, status: response.data.status } : company
+          company.id === companyToToggle.id ? { ...company, status: response.data.status } : company
         )
       );
-    } catch (error) {
-      console.error('Error al cambiar el estado', error);
-      alert('Error al cambiar el estado de la empresa');
+      notifySuccess(`Empresa ${companyToToggle.currentStatus ? 'inactivada' : 'activada'} exitosamente`);
+    } catch (error: any) {
+      console.error('Error al cambiar el estado:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Error al cambiar el estado de la empresa';
+      notifyError(errorMessage);
+    } finally {
+      setCompanyToToggle(null);
+      setIsConfirmModalOpen(false);
     }
   };
 
@@ -152,12 +184,13 @@ const Companies: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleView = (company: Company) => {
+    console.log('Ver empresa:', company);
+    notifyError('Función de visualización no implementada');
+  };
+
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
-
-  function handleView(company: Company): void {
-    throw new Error('Function not implemented.');
-  }
 
   return (
     <Layout>
@@ -350,10 +383,35 @@ const Companies: React.FC = () => {
                   </td>
                 </tr>
               ))}
+
             </tbody>
+
           </table>
+
         </div>
+        <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => {
+            setIsConfirmModalOpen(false);
+            setCompanyIdToDelete(null);
+            setCompanyToToggle(null);
+          }}
+          onConfirm={() => {
+            if (companyIdToDelete) confirmDelete();
+            if (companyToToggle) confirmToggleStatus();
+          }}
+          title="Confirmar Acción"
+          message={
+            companyIdToDelete
+              ? '¿Estás seguro de que deseas eliminar esta empresa? Esta acción no se puede deshacer.'
+              : companyToToggle
+                ? `¿Estás seguro de que deseas ${companyToToggle.currentStatus ? 'inactivar' : 'activar'} esta empresa?`
+                : '¿Estás seguro de que deseas realizar esta acción?'
+          }
+        />
+
       </div>
+
     </Layout>
   );
 };
