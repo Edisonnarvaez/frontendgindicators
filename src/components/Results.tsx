@@ -645,43 +645,83 @@ const ResultComponent: React.FC = () => {
 
           {/* Modal de visualización */}
           {isViewModalOpen && viewResult && (
-            <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
-              <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-md mx-auto my-4 sm:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Detalles del Resultado</h2>
-                <div className="space-y-4">
-                  <p>
-                    <strong>Sede:</strong>{' '}
-                    {headquarters.find((hq) => hq.id === viewResult.headquarters)?.name || 'N/A'}
-                  </p>
-                  <p>
-                    <strong>Indicador:</strong>{' '}
-                    {indicators.find((ind) => ind.id === viewResult.indicator)?.name || 'N/A'}
-                  </p>
-                  <p>
-                    <strong>Numerador:</strong> {viewResult.numerator}
-                  </p>
-                  <p>
-                    <strong>Denominador:</strong> {viewResult.denominator}
-                  </p>
-                  <p>
-                    <strong>Valor Calculado:</strong> {formatNumber(viewResult.calculatedValue)}
-                  </p>
-                  <p>
-                    <strong>Año:</strong> {viewResult.year}
-                  </p>
-                  <p>
-                    <strong>Mes:</strong> {viewResult.month}
-                  </p>
-                  <p>
-                    <strong>Trimestre:</strong> {viewResult.quarter}
-                  </p>
-                  <p>
-                    <strong>Semestre:</strong> {viewResult.semester}
-                  </p>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+              <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+                {/* Botón de cerrar en la esquina superior derecha */}
+                <button
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                  onClick={() => setIsViewModalOpen(false)}
+                  aria-label="Cerrar modal"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                {/* Título del modal */}
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+                  Detalles del Resultado
+                </h2>
+
+                {/* Contenido del modal */}
+                <div className="space-y-4 text-gray-700">
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Sede:</span>
+                    <span>
+                      {headquarters.find((hq) => hq.id === viewResult.headquarters)?.name || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Indicador:</span>
+                    <span>
+                      {indicators.find((ind) => ind.id === viewResult.indicator)?.name || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Numerador:</span>
+                    <span>{viewResult.numerator}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Denominador:</span>
+                    <span>{viewResult.denominator}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Valor Calculado:</span>
+                    <span>{formatNumber(viewResult.calculatedValue)}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Año:</span>
+                    <span>{viewResult.year}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Mes:</span>
+                    <span>{viewResult.month}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Trimestre:</span>
+                    <span>{viewResult.quarter}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="font-medium">Semestre:</span>
+                    <span>{viewResult.semester}</span>
+                  </div>
                 </div>
-                <div className="flex justify-center mt-6">
+
+                {/* Botón de cerrar en el footer */}
+                <div className="mt-8 flex justify-center">
                   <button
-                    className="px-4 py-2 sm:px-6 sm:py-3 bg-gray-300 rounded-md hover:bg-gray-400 transition-colors"
+                    className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
                     onClick={() => setIsViewModalOpen(false)}
                   >
                     Cerrar

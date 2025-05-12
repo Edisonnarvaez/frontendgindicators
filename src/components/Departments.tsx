@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
-import useNotifications from '../hooks/useNotifications'; 
+import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
 
 interface Company {
@@ -19,7 +19,6 @@ interface Department {
   departmentCode: string;
   company: number;
   description: string;
-  //creationDate: Date;  // Cambiado a string
   status: boolean;
 }
 
@@ -36,6 +35,8 @@ const Departments: React.FC = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [departmentIdToDelete, setDepartmentIdToDelete] = useState<number | null>(null);
   const [departmentToToggle, setDepartmentToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewResult, setViewResult] = useState<Department | null>(null);
 
   const [form, setForm] = useState<Partial<Department>>({
     name: '',
@@ -120,7 +121,8 @@ const Departments: React.FC = () => {
   };
 
   const handleView = (department: Department) => {
-    notifyError('Función de visualización no implementada');
+    setViewResult(department);
+    setIsViewModalOpen(true);
   };
 
   const handleDelete = (id: number) => {
@@ -298,6 +300,76 @@ const Departments: React.FC = () => {
             </div>
           </div>
         )}
+        
+        {/* Modal de visualización */}
+        {isViewModalOpen && viewResult && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+              {/* Botón de cerrar en la esquina superior derecha */}
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => setIsViewModalOpen(false)}
+                aria-label="Cerrar modal"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Título del modal */}
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+                Detalles del Área
+              </h2>
+
+              {/* Contenido del modal */}
+              <div className="space-y-4 text-gray-700">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Nombre:</span>
+                  <span>{viewResult.name || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Código de Área:</span>
+                  <span>{viewResult.departmentCode || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Empresa:</span>
+                  <span>
+                    {companies.find((company) => company.id === viewResult.company)?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Descripción:</span>
+                  <span>{viewResult.description || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Estado:</span>
+                  <span>{viewResult.status ? 'Activo' : 'Inactivo'}</span>
+                </div>
+              </div>
+
+              {/* Botón de cerrar en el footer */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
@@ -359,25 +431,25 @@ const Departments: React.FC = () => {
         </div>
       </div>
       <ConfirmationModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => {
-            setIsConfirmModalOpen(false);
-            setDepartmentIdToDelete(null);
-            setDepartmentToToggle(null);
-          }}
-          onConfirm={() => {
-            if (departmentIdToDelete) confirmDelete();
-            if (departmentToToggle) confirmToggleStatus();
-          }}
-          title="Confirmar Acción"
-          message={
-            departmentIdToDelete
-              ? '¿Estás seguro de que deseas eliminar esta área? Esta acción no se puede deshacer.'
-              : departmentToToggle
-              ? `¿Estás seguro de que deseas ${departmentToToggle.currentStatus ? 'inactivar' : 'activar'} esta área?`
-              : '¿Estás seguro de que deseas realizar esta acción?'
-          }
-        />
+        isOpen={isConfirmModalOpen}
+        onClose={() => {
+          setIsConfirmModalOpen(false);
+          setDepartmentIdToDelete(null);
+          setDepartmentToToggle(null);
+        }}
+        onConfirm={() => {
+          if (departmentIdToDelete) confirmDelete();
+          if (departmentToToggle) confirmToggleStatus();
+        }}
+        title="Confirmar Acción"
+        message={
+          departmentIdToDelete
+            ? '¿Estás seguro de que deseas eliminar esta área? Esta acción no se puede deshacer.'
+            : departmentToToggle
+            ? `¿Estás seguro de que deseas ${departmentToToggle.currentStatus ? 'inactivar' : 'activar'} esta área?`
+            : '¿Estás seguro de que deseas realizar esta acción?'
+        }
+      />
     </Layout>
   );
 };

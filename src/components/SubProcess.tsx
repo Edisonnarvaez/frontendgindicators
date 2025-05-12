@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
-import useNotifications from '../hooks/useNotifications'; 
+import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
 
 interface Process {
@@ -26,7 +26,8 @@ interface SubProcess {
   process: number;
   user: number;
 }
- const SubProcessComponent: React.FC = () => {
+
+const SubProcessComponent: React.FC = () => {
   const { notifySuccess, notifyError } = useNotifications();
   const [subProcesses, setSubProcesses] = useState<SubProcess[]>([]);
   const [processes, setProcesses] = useState<Process[]>([]);
@@ -37,6 +38,8 @@ interface SubProcess {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [subProcessIdToDelete, setSubProcessIdToDelete] = useState<number | null>(null);
   const [subProcessToToggle, setSubProcessToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewResult, setViewResult] = useState<SubProcess | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
 
@@ -125,7 +128,8 @@ interface SubProcess {
   };
 
   const handleView = (subProcess: SubProcess) => {
-    notifyError('Función de visualización no implementada');
+    setViewResult(subProcess);
+    setIsViewModalOpen(true);
   };
 
   const handleDelete = (id: number) => {
@@ -209,19 +213,7 @@ interface SubProcess {
 
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-          onClick={() => {
-            setIsModalOpen(true);
-            setForm({
-              name: '',
-              description: '',
-              code: '',
-              version: '',
-              author: '',
-              status: true,
-              process: 0,
-            });
-            setIsEditing(false);
-          }}
+          onClick={openModal}
         >
           Agregar SubProceso
         </button>
@@ -342,6 +334,92 @@ interface SubProcess {
           </div>
         )}
 
+        {/* Modal de visualización */}
+        {isViewModalOpen && viewResult && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+              {/* Botón de cerrar en la esquina superior derecha */}
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => setIsViewModalOpen(false)}
+                aria-label="Cerrar modal"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Título del modal */}
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+                Detalles del Subproceso
+              </h2>
+
+              {/* Contenido del modal */}
+              <div className="space-y-4 text-gray-700">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Nombre:</span>
+                  <span>{viewResult.name || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Descripción:</span>
+                  <span>{viewResult.description || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Código:</span>
+                  <span>{viewResult.code || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Versión:</span>
+                  <span>{viewResult.version || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Autor:</span>
+                  <span>{viewResult.author || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Estado:</span>
+                  <span>{viewResult.status ? 'Activo' : 'Inactivo'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Proceso:</span>
+                  <span>
+                    {processes.find((process) => process.id === viewResult.process)?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Fecha de Creación:</span>
+                  <span>{viewResult.creationDate || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Fecha de Actualización:</span>
+                  <span>{viewResult.updateDate || 'N/A'}</span>
+                </div>
+              </div>
+
+              {/* Botón de cerrar en el footer */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -404,25 +482,25 @@ interface SubProcess {
         </div>
       </div>
       <ConfirmationModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => {
-            setIsConfirmModalOpen(false);
-            setSubProcessIdToDelete(null);
-            setSubProcessToToggle(null);
-          }}
-          onConfirm={() => {
-            if (subProcessIdToDelete) confirmDelete();
-            if (subProcessToToggle) confirmToggleStatus();
-          }}
-          title="Confirmar Acción"
-          message={
-            subProcessIdToDelete
-              ? '¿Estás seguro de que deseas eliminar este subproceso? Esta acción no se puede deshacer.'
-              : subProcessToToggle
-              ? `¿Estás seguro de que deseas ${subProcessToToggle.currentStatus ? 'inactivar' : 'activar'} este subproceso?`
-              : '¿Estás seguro de que deseas realizar esta acción?'
-          }
-        />
+        isOpen={isConfirmModalOpen}
+        onClose={() => {
+          setIsConfirmModalOpen(false);
+          setSubProcessIdToDelete(null);
+          setSubProcessToToggle(null);
+        }}
+        onConfirm={() => {
+          if (subProcessIdToDelete) confirmDelete();
+          if (subProcessToToggle) confirmToggleStatus();
+        }}
+        title="Confirmar Acción"
+        message={
+          subProcessIdToDelete
+            ? '¿Estás seguro de que deseas eliminar este subproceso? Esta acción no se puede deshacer.'
+            : subProcessToToggle
+            ? `¿Estás seguro de que deseas ${subProcessToToggle.currentStatus ? 'inactivar' : 'activar'} este subproceso?`
+            : '¿Estás seguro de que deseas realizar esta acción?'
+        }
+      />
     </Layout>
   );
 };

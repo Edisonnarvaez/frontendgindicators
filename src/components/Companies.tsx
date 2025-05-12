@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { FaEye, FaToggleOff, FaToggleOn, FaTrash } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
-import useNotifications from '../hooks/useNotifications'; 
+import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
 
 interface Company {
@@ -28,7 +28,9 @@ const Companies: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user) as { id: number } | null;
   const userId = user ? user.id : null;
-
+  const [isFormVisible, setFormVisible] = useState(false)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewResult, setSelectedCompany] = useState<Company | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -36,7 +38,7 @@ const Companies: React.FC = () => {
   const [companyToToggle, setCompanyToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
 
   //**********0 */
- 
+
   //******** */
 
   const [form, setForm] = useState<Partial<Company>>({
@@ -185,9 +187,11 @@ const Companies: React.FC = () => {
   };
 
   const handleView = (company: Company) => {
-    console.log('Ver empresa:', company);
-    notifyError('Función de visualización no implementada');
+    setSelectedCompany(company); // Establece el objeto Company en viewResult
+    setIsViewModalOpen(true); // Activa el modal de visualización
   };
+
+
 
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
@@ -388,7 +392,89 @@ const Companies: React.FC = () => {
 
           </table>
 
+
         </div>
+
+        {/* Modal de visualización */}
+        {isViewModalOpen && viewResult && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+        {/* Botón de cerrar en la esquina superior derecha */}
+        <button
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+          onClick={() => setIsViewModalOpen(false)}
+          aria-label="Cerrar modal"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        {/* Título del modal */}
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+          Detalles de la Empresa
+        </h2>
+
+        {/* Contenido del modal */}
+        <div className="space-y-4 text-gray-700">
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Nombre:</span>
+            <span>{viewResult.name || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">NIT:</span>
+            <span>{viewResult.nit || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Representante Legal:</span>
+            <span>{viewResult.legalRepresentative || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Teléfono:</span>
+            <span>{viewResult.phone || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Dirección:</span>
+            <span>{viewResult.address || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Correo Electrónico:</span>
+            <span>{viewResult.contactEmail || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Fecha de Fundación:</span>
+            <span>{viewResult.foundationDate || 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b pb-2">
+            <span className="font-medium">Estado:</span>
+            <span>{viewResult.status ? 'Activo' : 'Inactivo'}</span>
+          </div>
+        </div>
+
+        {/* Botón de cerrar en el footer */}
+        <div className="mt-8 flex justify-center">
+          <button
+            className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+            onClick={() => setIsViewModalOpen(false)}
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+)}
         <ConfirmationModal
           isOpen={isConfirmModalOpen}
           onClose={() => {
@@ -411,6 +497,7 @@ const Companies: React.FC = () => {
         />
 
       </div>
+
 
     </Layout>
   );

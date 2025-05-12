@@ -3,7 +3,7 @@ import Layout from './Layout';
 import api from '../api';
 import { toast } from 'react-toastify';
 import { FaTrash, FaEdit, FaToggleOn, FaToggleOff, FaEye } from 'react-icons/fa';
-import useNotifications from '../hooks/useNotifications'; 
+import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
 
 interface User {
@@ -51,7 +51,8 @@ const Users: React.FC = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState<number | null>(null);
   const [userIdToToggle, setUserIdToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
-
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [form, setForm] = useState<Partial<User>>({
     firstName: '',
@@ -244,8 +245,8 @@ const Users: React.FC = () => {
   };
 
   const handleView = (user: User) => {
-   // setSelectedUser(user);
-    //setIsViewModalOpen(true);
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
   };
 
   const handleOpenModal = () => {
@@ -266,28 +267,26 @@ const Users: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  
-
   if (loading) return <Layout><div>Loading...</div></Layout>;
   if (error) return <Layout><div>Error: {error}</div></Layout>;
-  return (
 
+  return (
     <Layout>
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">Usuarios</h1>
 
-        {/* Botón para abrir el modal para agregar un nuevo macroproceso */}
+        {/* Botón para abrir el modal para agregar un nuevo usuario */}
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-          onClick={handleOpenModal}  // Usamos la función `handleOpenModal`
+          onClick={handleOpenModal}
         >
           Agregar Usuario
         </button>
 
-        {/* Modal */}
+        {/* Modal de edición/creación */}
         {isModalOpen && (
           <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-auto my-4 sm:p-8">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-auto my Agu-4 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Usuario</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
@@ -444,6 +443,108 @@ const Users: React.FC = () => {
           </div>
         )}
 
+        {/* Modal de visualización */}
+        {isViewModalOpen && selectedUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+              {/* Botón de cerrar en la esquina superior derecha */}
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => setIsViewModalOpen(false)}
+                aria-label="Cerrar modal"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Título del modal */}
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+                Detalles del Usuario
+              </h2>
+
+              {/* Contenido del modal */}
+              <div className="space-y-4 text-gray-700">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Nombre:</span>
+                  <span>{selectedUser.firstName || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Apellidos:</span>
+                  <span>{selectedUser.lastName || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Usuario:</span>
+                  <span>{selectedUser.username || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Correo Electrónico:</span>
+                  <span>{selectedUser.email || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Teléfono:</span>
+                  <span>{selectedUser.phone || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Empresa:</span>
+                  <span>
+                    {companies.find((company) => company.id === selectedUser.company)?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Área:</span>
+                  <span>
+                    {departments.find((dept) => dept.id === selectedUser.department)?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Rol:</span>
+                  <span>
+                    {roles.find((role) => role.id === selectedUser.role)?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Estado:</span>
+                  <span>{selectedUser.status ? 'Activo' : 'Inactivo'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Fecha de Creación:</span>
+                  <span>{selectedUser.creationDate || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Fecha de Actualización:</span>
+                  <span>{selectedUser.updateDate || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-medium">Último Inicio de Sesión:</span>
+                  <span>{selectedUser.lastLogin || 'N/A'}</span>
+                </div>
+              </div>
+
+              {/* Botón de cerrar en el footer */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tabla de usuarios */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
@@ -464,8 +565,12 @@ const Users: React.FC = () => {
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.firstName}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.lastName}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.department}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.role}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {departments.find((dept) => dept.id === user.department)?.name || user.department}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {roles.find((role) => role.id === user.role)?.name || user.role}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500">{user.status ? 'Activo' : 'Inactivo'}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 flex space-x-4">
                     <button
@@ -500,34 +605,30 @@ const Users: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-            
           </table>
         </div>
-        
       </div>
       <ConfirmationModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => {
-            setIsConfirmModalOpen(false);
-            setUserIdToDelete(null);
-            setUserIdToToggle(null);
-          }}
-          onConfirm={() => {
-            if (userIdToDelete) confirmDelete();
-            if (userIdToToggle) confirmToggleStatus();
-          }}
-          title="Confirmar Acción"
-          message={
-            userIdToDelete
-              ? '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.'
-              : userIdToToggle
-              ? `¿Estás seguro de que deseas ${userIdToToggle.currentStatus ? 'inactivar' : 'activar'} este usuario?`
-              : '¿Estás seguro de que deseas realizar esta acción?'
-          }
-        />
-    
+        isOpen={isConfirmModalOpen}
+        onClose={() => {
+          setIsConfirmModalOpen(false);
+          setUserIdToDelete(null);
+          setUserIdToToggle(null);
+        }}
+        onConfirm={() => {
+          if (userIdToDelete) confirmDelete();
+          if (userIdToToggle) confirmToggleStatus();
+        }}
+        title="Confirmar Acción"
+        message={
+          userIdToDelete
+            ? '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.'
+            : userIdToToggle
+            ? `¿Estás seguro de que deseas ${userIdToToggle.currentStatus ? 'inactivar' : 'activar'} este usuario?`
+            : '¿Estás seguro de que deseas realizar esta acción?'
+        }
+      />
     </Layout>
-    
   );
 };
 

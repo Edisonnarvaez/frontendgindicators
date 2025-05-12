@@ -26,7 +26,6 @@ interface Headquarter {
     status: boolean;
 }
 
-
 const Headquarter: React.FC = () => {
     const [headquarters, setHeadquarters] = useState<Headquarter[]>([]);
     const [companies, setCompanies] = useState<company[]>([]);
@@ -37,10 +36,12 @@ const Headquarter: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const { notifySuccess, notifyError } = useNotifications(); const [headquarterIdToDelete, setHeadquarterIdToDelete] = useState<number | null>(null);
+    const { notifySuccess, notifyError } = useNotifications();
+    const [headquarterIdToDelete, setHeadquarterIdToDelete] = useState<number | null>(null);
     const [headquarterToToggle, setHeadquarterToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [viewResult, setViewResult] = useState<Headquarter | null>(null);
     const [form, setForm] = useState<Partial<Headquarter>>({
-
         name: '',
         habilitationCode: '',
         company: 0,
@@ -50,7 +51,6 @@ const Headquarter: React.FC = () => {
         habilitationDate: '',
         closingDate: '',
         status: true,
-
     });
 
     useEffect(() => {
@@ -128,7 +128,8 @@ const Headquarter: React.FC = () => {
     };
 
     const handleView = (headquarter: Headquarter) => {
-        notifyError('Función de visualización no implementada');
+        setViewResult(headquarter);
+        setIsViewModalOpen(true);
     };
 
     const handleDelete = (id: number) => {
@@ -354,6 +355,91 @@ const Headquarter: React.FC = () => {
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                )}
+                {/* Modal de visualización */}
+                {isViewModalOpen && viewResult && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
+                        <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+                            {/* Botón de cerrar en la esquina superior derecha */}
+                            <button
+                                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                                onClick={() => setIsViewModalOpen(false)}
+                                aria-label="Cerrar modal"
+                            >
+                                <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+
+                            {/* Título del modal */}
+                            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
+                                Detalles de la Sede
+                            </h2>
+
+                            {/* Contenido del modal */}
+                            <div className="space-y-4 text-gray-700">
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Nombre:</span>
+                                    <span>{viewResult.name || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Código de Habilitación:</span>
+                                    <span>{viewResult.habilitationCode || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Empresa:</span>
+                                    <span>
+                                        {companies.find((company) => company.id === viewResult.company)?.name || 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Departamento:</span>
+                                    <span>{viewResult.departament || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Ciudad:</span>
+                                    <span>{viewResult.city || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Dirección:</span>
+                                    <span>{viewResult.address || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Fecha de Habilitación:</span>
+                                    <span>{viewResult.habilitationDate || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Fecha de Cierre:</span>
+                                    <span>{viewResult.closingDate || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between border-b pb-2">
+                                    <span className="font-medium">Estado:</span>
+                                    <span>{viewResult.status ? 'Activo' : 'Inactivo'}</span>
+                                </div>
+                            </div>
+
+                            {/* Botón de cerrar en el footer */}
+                            <div className="mt-8 flex justify-center">
+                                <button
+                                    className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+                                    onClick={() => setIsViewModalOpen(false)}
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
