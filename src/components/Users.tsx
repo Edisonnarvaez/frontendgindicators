@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import { FaTrash, FaEdit, FaToggleOn, FaToggleOff, FaEye } from 'react-icons/fa';
 import useNotifications from '../hooks/useNotifications';
 import ConfirmationModal from './ConfirmationModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface User {
   id: number;
@@ -53,6 +55,8 @@ const Users: React.FC = () => {
   const [userIdToToggle, setUserIdToToggle] = useState<{ id: number; currentStatus: boolean } | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const user = useSelector((state: RootState) => state.user) as { id: number; username: string; email: string } | null;
 
   const [form, setForm] = useState<Partial<User>>({
     firstName: '',
@@ -121,33 +125,50 @@ const Users: React.FC = () => {
     fetchRoles();
   }, []);
 
+  useEffect(() => {
+    
+  }, [form]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value,
-    }));
+    setForm((prevForm) => {
+      const newForm = {
+        ...prevForm,
+        [name]: value,
+      };
+      
+      return newForm;
+    });
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value === 'true',
-    }));
+    setForm((prevForm) => {
+      const newForm = {
+        ...prevForm,
+        [name]: value === 'true',
+      };
+    
+      return newForm;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = {
-      ...form,
-      status: form.status,
-      department: form.department,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      username: form.username,
+      email: form.email,
+      phone: form.phone,
       company: form.company,
+      department: form.department,
       role: form.role,
+      status: form.status,
+      password: form.password,
     };
-    delete formData.lastLogin;
+    
 
     try {
       if (isEditing) {
@@ -158,6 +179,7 @@ const Users: React.FC = () => {
         notifySuccess('Usuario actualizado exitosamente');
       } else {
         const response = await api.post(`/users/`, formData);
+      
         setUsers((prev) => [...prev, response.data]);
         notifySuccess('Usuario creado exitosamente');
       }
@@ -250,8 +272,9 @@ const Users: React.FC = () => {
   };
 
   const handleOpenModal = () => {
+    
     setIsEditing(false);
-    setForm({
+    const newForm = {
       firstName: '',
       lastName: '',
       username: '',
@@ -263,7 +286,9 @@ const Users: React.FC = () => {
       status: true,
       lastLogin: '',
       password: '',
-    });
+    };
+    
+    setForm(newForm);
     setIsModalOpen(true);
   };
 
@@ -278,7 +303,10 @@ const Users: React.FC = () => {
         {/* Botón para abrir el modal para agregar un nuevo usuario */}
         <button
           className="mb-4 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-          onClick={handleOpenModal}
+          onClick={() => {
+            
+            handleOpenModal();
+          }}
         >
           Agregar Usuario
         </button>
@@ -286,7 +314,7 @@ const Users: React.FC = () => {
         {/* Modal de edición/creación */}
         {isModalOpen && (
           <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-auto my Agu-4 sm:p-8">
+            <div className="bg-white rounded-lg p-6 shadow-xl w-full max-w-2xl mx-auto my-4 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">{isEditing ? 'Editar' : 'Agregar'} Usuario</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
@@ -296,10 +324,11 @@ const Users: React.FC = () => {
                       type="text"
                       name="firstName"
                       placeholder="Nombres"
-                      value={form.firstName || ''}
+                      value={form.firstName ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div>
@@ -308,34 +337,39 @@ const Users: React.FC = () => {
                       type="text"
                       name="lastName"
                       placeholder="Apellidos"
-                      value={form.lastName || ''}
+                      value={form.lastName ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">Usuario</label>
+                    <label htmlFor="userName" className="block text-sm font-medium text-gray-700">Usuario</label>
                     <input
                       type="text"
                       name="username"
+                      id="userName"
                       placeholder="Usuario"
-                      value={form.username || ''}
+                      value={form.username ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
+                      autoComplete="new-username"
                     />
                   </div>
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <label htmlFor="userPassword" className="block text-sm font-medium text-gray-700">Contraseña</label>
                     <input
                       type="password"
                       name="password"
+                      id="userPassword"
                       placeholder="Contraseña"
-                      value={form.password || ''}
+                      value={form.password ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required={!isEditing}
+                      autoComplete="new-password"
                     />
                   </div>
                   <div>
@@ -344,10 +378,11 @@ const Users: React.FC = () => {
                       type="email"
                       name="email"
                       placeholder="Correo electrónico"
-                      value={form.email || ''}
+                      value={form.email ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div>
@@ -356,17 +391,18 @@ const Users: React.FC = () => {
                       type="text"
                       name="phone"
                       placeholder="Teléfono"
-                      value={form.phone || ''}
+                      value={form.phone ?? ''}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                       required
+                      autoComplete="off"
                     />
                   </div>
                   <div>
                     <label htmlFor="company" className="block text-sm font-medium text-gray-700">Empresa</label>
                     <select
                       name="company"
-                      value={form.company || 0}
+                      value={form.company ?? 0}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -382,7 +418,7 @@ const Users: React.FC = () => {
                     <label htmlFor="department" className="block text-sm font-medium text-gray-700">Area</label>
                     <select
                       name="department"
-                      value={form.department || 0}
+                      value={form.department ?? 0}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -398,7 +434,7 @@ const Users: React.FC = () => {
                     <label htmlFor="role" className="block text-sm font-medium text-gray-700">Rol</label>
                     <select
                       name="role"
-                      value={form.role || 0}
+                      value={form.role ?? 0}
                       onChange={handleChange}
                       className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -447,7 +483,6 @@ const Users: React.FC = () => {
         {isViewModalOpen && selectedUser && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4 transition-opacity duration-300 ease-out">
             <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8 transform transition-all duration-300 scale-100 hover:scale-[1.01]">
-              {/* Botón de cerrar en la esquina superior derecha */}
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
                 onClick={() => setIsViewModalOpen(false)}
@@ -468,13 +503,9 @@ const Users: React.FC = () => {
                   />
                 </svg>
               </button>
-
-              {/* Título del modal */}
               <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center tracking-tight">
                 Detalles del Usuario
               </h2>
-
-              {/* Contenido del modal */}
               <div className="space-y-4 text-gray-700">
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium">Nombre:</span>
@@ -531,8 +562,6 @@ const Users: React.FC = () => {
                   <span>{selectedUser.lastLogin || 'N/A'}</span>
                 </div>
               </div>
-
-              {/* Botón de cerrar en el footer */}
               <div className="mt-8 flex justify-center">
                 <button
                   className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
