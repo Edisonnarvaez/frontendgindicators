@@ -70,8 +70,10 @@ const ResultComponent: React.FC = () => {
     calculatedValue: 0,
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
-    quarter: 0,
-    semester: 0,
+    quarter: Math.ceil((new Date().getMonth() + 1) / 3),
+    semester: new Date().getMonth() + 1 <= 6 ? 1 : 2,
+    //quarter: 0,
+    //semester: 0,
   });
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof Result, string>>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -187,14 +189,14 @@ const ResultComponent: React.FC = () => {
       ...form,
       [name]:
         name === 'headquarters' ||
-        name === 'indicator' ||
-        name === 'numerator' ||
-        name === 'denominator' ||
-        name === 'calculatedValue' ||
-        name === 'year' ||
-        name === 'month' ||
-        name === 'quarter' ||
-        name === 'semester'
+          name === 'indicator' ||
+          name === 'numerator' ||
+          name === 'denominator' ||
+          name === 'calculatedValue' ||
+          name === 'year' ||
+          name === 'month' ||
+          name === 'quarter' ||
+          name === 'semester'
           ? Number(value)
           : value,
     });
@@ -323,168 +325,156 @@ const ResultComponent: React.FC = () => {
   return (
     <ErrorBoundary>
       <Layout>
-          {/* Formulario */}
-          <div className="p-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-semibold text-center mb-6">Resultados de Indicadores</h1>
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <div className="container mx-auto p-4"></div>
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
-            <button
-              onClick={() => {
-                setFormVisible((prev) => !prev);
-                if (isFormVisible) resetForm();
-              }}
-              className="mb-2 sm:mb-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              {isFormVisible ? 'Ocultar Formulario' : 'Agregar Resultado'}
-            </button>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2 ${
-                isRefreshing ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              title="Actualizar tabla"
-              aria-label="Actualizar tabla de resultados"
-            >
-              <FaSyncAlt className={isRefreshing ? 'animate-spin' : ''} />
-              <span>{isRefreshing ? 'Actualizando...' : 'Actualizar'}</span>
-            </button>
-          </div>
-
-          {isFormVisible && (
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h2 className="text-xl font-semibold mb-4 text-center">
-                {isEditing ? "Editar Resultado" : "Agregar Nuevo Resultado"}
-              </h2>
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Sede</label>
-                  <select
-                    name="headquarters"
-                    value={form.headquarters}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Seleccione...</option>
-                    {headquarters.map((hq) => (
-                      <option key={hq.id} value={hq.id}>
-                        {hq.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Indicador</label>
-                  <select
-                    name="indicator"
-                    value={form.indicator}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Seleccione...</option>
-                    {indicators.map((indicator) => (
-                      <option key={indicator.id} value={indicator.id}>
-                        {indicator.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Numerador</label>
-                  <input
-                    type="number"
-                    name="numerator"
-                    value={form.numerator}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Denominador</label>
-                  <input
-                    type="number"
-                    name="denominator"
-                    value={form.denominator}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Año</label>
-                  <input
-                    type="number"
-                    name="year"
-                    value={form.year}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Mes</label>
-                  <input
-                    type="number"
-                    name="month"
-                    value={form.month}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Trimestre</label>
-                  <input
-                    type="number"
-                    name="quarter"
-                    value={form.quarter}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Semestre</label>
-                  <input
-                    type="number"
-                    name="semester"
-                    value={form.semester}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                
-                <div className="sm:col-span-2 flex justify-center space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForm({
-                        headquarters: 0,
-                        indicator: 0,
-                        numerator: 0,
-                        denominator: 0,
-                        //calculatedValue: 0,
-                        year: new Date().getFullYear(),
-                        month: new Date().getMonth() + 1,
-                        quarter: 0,
-                        semester: 0,
-                      });
-                      setIsEditing(false);
-                    }}
-                    className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                  >
-                    {isEditing ? "Actualizar" : "Guardar"}
-                  </button>
-                </div>
-
-              </form>
+        {/* Formulario */}
+        <div className="p-6 max-w-7xl mx-auto">
+          <h1 className="text-3xl font-semibold text-center mb-6">Resultados de Indicadores</h1>
+          <div className="bg-gray-100 p-6 rounded-lg shadow-md">
+            <div className="container mx-auto p-4"></div>
+            {/* Botones de acción */}
+            <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+              <button
+                onClick={() => {
+                  setFormVisible((prev) => !prev);
+                  if (isFormVisible) resetForm();
+                }}
+                className="mb-2 sm:mb-0 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                {isFormVisible ? 'Ocultar Formulario' : 'Agregar Resultado'}
+              </button>
             </div>
-          )}
-        </div>
+
+            {isFormVisible && (
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                  {isEditing ? "Editar Resultado" : "Agregar Nuevo Resultado"}
+                </h2>
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Sede</label>
+                    <select
+                      name="headquarters"
+                      value={form.headquarters}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Seleccione...</option>
+                      {headquarters.map((hq) => (
+                        <option key={hq.id} value={hq.id}>
+                          {hq.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Indicador</label>
+                    <select
+                      name="indicator"
+                      value={form.indicator}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Seleccione...</option>
+                      {indicators.map((indicator) => (
+                        <option key={indicator.id} value={indicator.id}>
+                          {indicator.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Numerador</label>
+                    <input
+                      type="number"
+                      name="numerator"
+                      value={form.numerator}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Denominador</label>
+                    <input
+                      type="number"
+                      name="denominator"
+                      value={form.denominator}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Año</label>
+                    <input
+                      type="number"
+                      name="year"
+                      value={form.year}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Mes</label>
+                    <input
+                      type="number"
+                      name="month"
+                      value={form.month}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Trimestre</label>
+                    <input
+                      type="number"
+                      name="quarter"
+                      value={form.quarter}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Semestre</label>
+                    <input
+                      type="number"
+                      name="semester"
+                      value={form.semester}
+                      onChange={handleChange}
+                      className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2 flex justify-center space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm({
+                          headquarters: 0,
+                          indicator: 0,
+                          numerator: 0,
+                          denominator: 0,
+                          //calculatedValue: 0,
+                          year: new Date().getFullYear(),
+                          month: new Date().getMonth() + 1,
+                          quarter: 0,
+                          semester: 0,
+                        });
+                        setIsEditing(false);
+                      }}
+                      className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                    >
+                      {isEditing ? "Actualizar" : "Guardar"}
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            )}
+          </div>
 
           {/* Filtros */}
           <div className="mb-6">
@@ -528,12 +518,23 @@ const ResultComponent: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <div className="flex items-end">
+              <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4 items-end ">
                 <button
                   onClick={resetFilters}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-full sm:w-auto"
                 >
                   Limpiar Filtros
+                </button>
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2 ${isRefreshing ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  title="Actualizar tabla"
+                  aria-label="Actualizar tabla de resultados"
+                >
+                  <FaSyncAlt className={isRefreshing ? 'animate-spin' : ''} />
+                  <span>{isRefreshing ? 'Actualizando...' : 'Actualizar'}</span>
                 </button>
               </div>
             </div>
