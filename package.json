@@ -14,6 +14,7 @@
     "@reduxjs/toolkit": "^2.2.1",
     "axios": "^1.7.7",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.11.0",
     "health-indicators-frontend": "file:",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",

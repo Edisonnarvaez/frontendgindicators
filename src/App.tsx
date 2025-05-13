@@ -14,15 +14,13 @@ import Indicators from './components/Indicators';
 import MacroProcess from './components/MacroProcess';
 import Process from './components/Process';
 import SubProcess from './components/SubProcess';
-//import MacroProcessComponent from './components/MacroProcessComponent';
-//import MacroProcessForm from './components/MacroProcessForm';
 import PrivateRoute from './components/PrivateRoute';
 import Results from './components/Results';
-import ResetPassword from './components/ResetPassword';   // El nuevo componente que crearemos
+import ResetPassword from './components/ResetPassword'; 
 import Settings from './components/Settings';
 import UserInitializer from './components/UserInitializer';
 import Headquarters from './components/Headquarters';
-//import DashboardPage from "./components/Dashboard/DashboardPage";
+import About from './components/About'; 
 
 function App() {
   return (
@@ -45,13 +43,8 @@ function App() {
               <Route path="/process" element={<PrivateRoute><Process /></PrivateRoute>} />
               <Route path="/subprocess" element={<PrivateRoute><SubProcess /></PrivateRoute>} />
               <Route path="/Results" element={<PrivateRoute><Results /></PrivateRoute>} />
-              {/* <Route path="/Results" element={<PrivateRoute><Results isOpen={true} onClose={() => { }} onSave={() => { }} currentUserId={"1"} /></PrivateRoute>} /> */}
               <Route path="/settings" element={<Settings />} />
-              {/* <Route path="/" element={<DashboardPage />} /> */}
-              {/* Ruta principal que muestra la lista de MacroProcesos */}
-              {/*<Route path="/" element={<MacroProcessComponent />} />*/}
-              {/* Ruta para abrir el formulario de nuevo macroproceso */}
-              {/* <Route path="/new-macro-process" element={<MacroProcessForm />} /> */}
+              <Route path="/acerca-de" element={<About />} />
             </Routes>
           </div>
         </UserInitializer>

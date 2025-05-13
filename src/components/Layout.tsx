@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { BarChart, Users, Building, Briefcase, Activity, Dock, FolderKanban, SquareChartGantt, ChartLine, LogOut, Building2 } from 'lucide-react';
 import { Settings as SettingsIcon } from 'lucide-react';
+import { FaLightbulb } from 'react-icons/fa';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -75,6 +76,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Link to="/settings" className="block py-2 px-4 hover:bg-indigo-600 flex items-center">
             <SettingsIcon className="mr-2" size={20} />
             Configuraciones
+          </Link>
+          <Link to="/acerca-de" className="flex items-center p-3 hover:bg-indigo-600 transition">
+            <FaLightbulb className="mr-3" />
+            <span>Acerca de</span>
           </Link>
           <button
             onClick={handleLogout}
