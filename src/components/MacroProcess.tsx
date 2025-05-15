@@ -58,7 +58,7 @@ const MacroProcessComponent: React.FC = () => {
         setMacroProcesses(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching macroprocesses:', err);
+        console.error('Error al obtener macroprocesos:', err);
         setError('No se pudieron cargar los macroprocesos');
         notifyError('No se pudieron cargar los macroprocesos');
         setLoading(false);
@@ -70,7 +70,7 @@ const MacroProcessComponent: React.FC = () => {
         const response = await api.get('/departments/');
         setDepartments(response.data);
       } catch (err: any) {
-        console.error('Error fetching departments:', err);
+        console.error('Error al obtener areas:', err);
         setError('No se pudieron cargar las áreas');
         notifyError('No se pudieron cargar las áreas');
       }

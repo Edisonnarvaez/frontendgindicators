@@ -81,7 +81,7 @@ const IndicatorComponent: React.FC = () => {
         setIndicators(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching indicators:', err);
+        console.error('Error al obtener indicadores:', err);
         setError('No se pudieron cargar los indicadores');
         notifyError('No se pudieron cargar los indicadores');
         setLoading(false);
@@ -93,7 +93,7 @@ const IndicatorComponent: React.FC = () => {
         const response = await api.get('/subprocesses/');
         setSubProcesses(response.data);
       } catch (err: any) {
-        console.error('Error fetching subprocesses:', err);
+        console.error('Error al obtener subprocesos:', err);
         setError('No se pudieron cargar los subprocesos');
         notifyError('No se pudieron cargar los subprocesos');
       }
@@ -118,7 +118,7 @@ const IndicatorComponent: React.FC = () => {
       ...form,
       user: userId,
     };
-    console.log('Datos enviados al backend:', formData);
+    //console.log('Datos enviados al backend:', formData);
 
     try {
       if (isEditing) {

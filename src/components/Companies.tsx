@@ -59,7 +59,7 @@ const Companies: React.FC = () => {
         setCompanies(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching companies:', err);
+        console.error('Error al obtener empresas:', err);
         setError('No se pudieron cargar las empresas');
         notifyError('No se pudieron cargar las empresas');
         setLoading(false);

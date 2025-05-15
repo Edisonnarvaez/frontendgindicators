@@ -60,7 +60,7 @@ const SubProcessComponent: React.FC = () => {
         setSubProcesses(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching subprocesses:', err);
+        console.error('Error al obtener subprocesos:', err);
         setError('No se pudieron cargar los subprocesos');
         notifyError('No se pudieron cargar los subprocesos');
         setLoading(false);
@@ -72,7 +72,7 @@ const SubProcessComponent: React.FC = () => {
         const response = await api.get('/processes/');
         setProcesses(response.data);
       } catch (err: any) {
-        console.error('Error fetching processes:', err);
+        console.error('Error al obtener procesos:', err);
         setError('No se pudieron cargar los procesos');
         notifyError('No se pudieron cargar los procesos');
       }

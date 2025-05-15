@@ -56,7 +56,7 @@ const ProcessComponent: React.FC = () => {
         const response = await api.get('/processes/');
         setProcesses(response.data);
       } catch (err: any) {
-        console.error('Error fetching processes:', err);
+        console.error('Error al obtener procesos:', err);
         setError('No se pudieron cargar los procesos');
         notifyError('No se pudieron cargar los procesos');
       } finally {
@@ -69,7 +69,7 @@ const ProcessComponent: React.FC = () => {
         const response = await api.get('/macroprocesses/');
         setMacroProcesses(response.data);
       } catch (err: any) {
-        console.error('Error fetching macroprocesses:', err);
+        console.error('Error al obtener macroprocesos:', err);
         setError('No se pudieron cargar los macroprocesos');
         notifyError('No se pudieron cargar los macroprocesos');
       }

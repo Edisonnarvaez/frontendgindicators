@@ -104,11 +104,11 @@ const ResultComponent: React.FC = () => {
         setHeadquarters(headquartersRes.data);
         setFilteredResults(resultsRes.data);
         setLoading(false);
-        console.log('Resultados:', resultsRes.data);
-        console.log('Indicadores:', indicatorsRes.data);
-        console.log('Sedes:', headquartersRes.data);
+        //console.log('Resultados:', resultsRes.data);
+        //console.log('Indicadores:', indicatorsRes.data);
+        //console.log('Sedes:', headquartersRes.data);
       } catch (err: any) {
-        console.error('Error fetching data:', err);
+        console.error('Error al obtener datos:', err);
         setError('No se pudieron cargar los datos');
         notifyError('No se pudieron cargar los datos');
         setLoading(false);
@@ -125,7 +125,7 @@ const ResultComponent: React.FC = () => {
         (indicatorFilter ? result.indicator === Number(indicatorFilter) : true)
     );
     setFilteredResults(filtered);
-    console.log('Resultados filtrados:', filtered);
+    //console.log('Resultados filtrados:', filtered);
   }, [results, headquartersFilter, indicatorFilter]);
 
   const handleRefresh = async () => {
@@ -141,7 +141,7 @@ const ResultComponent: React.FC = () => {
         )
       );
       notifySuccess('Tabla de resultados actualizada');
-      console.log('Resultados recargados:', resultsRes.data);
+      //console.log('Resultados recargados:', resultsRes.data);
     } catch (err: any) {
       console.error('Error al recargar resultados:', err);
       notifyError('Error al recargar los resultados');
@@ -246,7 +246,7 @@ const ResultComponent: React.FC = () => {
       //console.log('Resultados filtrados actualizados:', filteredResults);
       resetForm();
     } catch (err: any) {
-      //console.error('Error al guardar el resultado:', err);
+      console.error('Error al guardar el resultado:', err);
       const errorMessage =
         err.response?.data?.message || 'Error al guardar la metrica';
       notifyError(errorMessage);
@@ -278,7 +278,7 @@ const ResultComponent: React.FC = () => {
       setFilteredResults((prev) => prev.filter((r) => r.id !== resultIdToDelete));
       notifySuccess('Registro eliminado exitosamente');
     } catch (err: any) {
-      //console.error('Error al eliminar el registro:', err);
+      console.error('Error al eliminar el registro:', err);
       const errorMessage =
         err.response?.data?.message || 'Error al eliminar el registro';
       notifyError(errorMessage);

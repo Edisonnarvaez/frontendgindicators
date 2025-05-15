@@ -68,7 +68,7 @@ const Settings: React.FC = () => {
   }, []);
 
   const fetchProfile = async () => {
-    console.log('Token:', token);
+    //console.log('Token:', token);
     try {
       const response = await api.get<Profile>('/users/me/', {
         headers: { Authorization: `Bearer ${token}` },

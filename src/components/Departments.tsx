@@ -53,7 +53,7 @@ const Departments: React.FC = () => {
         setDepartments(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching departments:', err);
+        console.error('Error al obtener areas:', err);
         setError('No se pudieron cargar las áreas');
         notifyError('No se pudieron cargar las áreas');
         setLoading(false);
@@ -65,7 +65,7 @@ const Departments: React.FC = () => {
         const response = await api.get('/companies/');
         setCompanies(response.data);
       } catch (err: any) {
-        console.error('Error fetching companies:', err);
+        console.error('Error al obtener empresas:', err);
         setError('No se pudieron cargar las empresas');
         notifyError('No se pudieron cargar las empresas');
       }

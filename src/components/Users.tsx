@@ -79,7 +79,7 @@ const Users: React.FC = () => {
         setUsers(response.data);
         setLoading(false);
       } catch (err: any) {
-        console.error('Error fetching users:', err);
+        console.error('Error al obtener usuarios:', err);
         setError('No se pudieron cargar los usuarios');
         notifyError('No se pudieron cargar los usuarios');
         setLoading(false);
@@ -91,9 +91,9 @@ const Users: React.FC = () => {
         const response = await api.get('/departments/');
         setDepartments(response.data);
       } catch (err: any) {
-        console.error('Error fetching departments:', err);
-        setError('No se pudieron cargar los departamentos');
-        notifyError('No se pudieron cargar los departamentos');
+        console.error('Error al obtener areas:', err);
+        setError('No se pudieron cargar los areas');
+        notifyError('No se pudieron cargar los areas');
       }
     };
 
@@ -102,7 +102,7 @@ const Users: React.FC = () => {
         const response = await api.get('/companies/');
         setCompanies(response.data);
       } catch (err: any) {
-        console.error('Error fetching companies:', err);
+        console.error('Error al obtener empresas:', err);
         setError('No se pudieron cargar las empresas');
         notifyError('No se pudieron cargar las empresas');
       }
@@ -113,7 +113,7 @@ const Users: React.FC = () => {
         const response = await api.get('/roles/');
         setRoles(response.data);
       } catch (err: any) {
-        console.error('Error fetching roles:', err);
+        console.error('Error al obtener roles:', err);
         setError('No se pudieron cargar los roles');
         notifyError('No se pudieron cargar los roles');
       }
