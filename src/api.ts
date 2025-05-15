@@ -3,7 +3,7 @@ import { store } from './store';
 import { setTokens, logout } from './store/slices/authSlice';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: 'https://gestorindicadores.onrender.com/api/',
 });
 
 // Añadir token automáticamente a cada request

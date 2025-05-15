@@ -39,7 +39,7 @@ const ResetPassword: React.FC = () => {
 
     try {
       const response = await axios.post<SuccessResponse>(
-        `http://127.0.0.1:8000/password-reset-confirm/${userId}/${token}/`,
+        `https://gestorindicadores.onrender.com/password-reset-confirm/${userId}/${token}/`,
         { new_password: newPassword },
         {
           headers: {

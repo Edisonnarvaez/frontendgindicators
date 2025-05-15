@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import api from '../api';
 
 // Definir tipos para las respuestas del backend
 interface SuccessResponse {
@@ -23,8 +24,8 @@ const ForgotPassword: React.FC = () => {
     setError('');   // Limpiar errores previos
 
     try {
-      const response = await axios.post<SuccessResponse>(
-        'http://127.0.0.1:8000/password-reset/',
+      const response = await api.post<SuccessResponse>(
+        'https://gestorindicadores.onrender.com/password-reset/',
         { email },
         {
           headers: {
