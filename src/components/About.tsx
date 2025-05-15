@@ -274,8 +274,8 @@ const buttonVariants = {
             <h3 className="text-lg font-semibold text-blue-700">Agradecimientos</h3>
           </div>
           <p className="text-sm sm:text-base text-gray-800">
-            Agradecimientos especiales a <strong>Red Medicron IPS</strong>, a la epidemióloga{" "}
-            <strong>Nury Trejo</strong>, y al área de calidad de la empresa por su invaluable apoyo durante el desarrollo
+            Agradecimientos especiales a <strong>Red Medicron IPS</strong>, a  la epidemióloga{" "}
+            <strong>Nury Ximena Trejo</strong>, y al área de calidad de la empresa por su invaluable apoyo durante el desarrollo
             del proyecto.
           </p>
         </motion.div>
