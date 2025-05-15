@@ -27,7 +27,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshResponse = await axios.post('http://localhost:8000/api/token/refresh/', {
+        const refreshResponse = await axios.post('https://gestorindicadores.onrender.com/api/token/refresh/', {
           refresh: refreshToken,
         });
 
