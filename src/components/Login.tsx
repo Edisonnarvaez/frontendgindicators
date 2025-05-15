@@ -33,7 +33,7 @@ const Login: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('https://gestorindicadores.onrender.com/users/login/', {
+      const response = await axios.post('https://gestorindicadores.onrender.com/api/users/login/', {
         username,
         password,
       });
