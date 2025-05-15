@@ -62,7 +62,7 @@ const Login: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('https://gestorindicadores.onrender.comapi/users/verify_2fa/', {
+      const response = await axios.post('https://gestorindicadores.onrender.com/api/users/verify_2fa/', {
         user_id: userId,
         otp_code: otp,
       });
